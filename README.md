@@ -1,5 +1,11 @@
 # LexCredo
 
+[![Last Commit](https://img.shields.io/github/last-commit/sippy-platform/lex_credo)](https://github.com/sippy-platform/lex_credo)
+[![Hex Version](https://img.shields.io/hexpm/v/lex_credo)](https://hex.pm/packages/lex_credo)
+[![Hex Downloads](https://img.shields.io/hexpm/dt/lex_credo)](https://hex.pm/packages/lex_credo)
+[![Documentation](https://img.shields.io/badge/hex-docs-purple?logo=elixir)](https://hexdocs.pm/lex_credo)
+[![Coverage Status](https://coveralls.io/repos/github/sippy-platform/lex_credo/badge.svg)](https://coveralls.io/github/sippy-platform/lex_credo)
+
 A collection of custom [Credo](https://github.com/rrrene/credo) checks for Elixir projects, designed to catch common anti-patterns and guide both **human developers and AI coding agents** toward idiomatic, maintainable Elixir code.
 
 > **Note:** This library was originally created to assist AI agents (such as Copilot, Claude, and similar tools) in avoiding common Elixir anti-patterns that they tend to reproduce. The checks are equally useful for human developers, but the primary motivation was to give AI-assisted codebases a static analysis layer that pushes back on known-bad patterns before they land in review.

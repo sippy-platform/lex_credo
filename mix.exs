@@ -12,6 +12,7 @@ defmodule LexCredo.MixProject do
 
       # ExDoc
       name: "LexCredo",
+      source_url: "https://github.com/sippy-platform/lex_credo",
       docs: docs(),
 
       # ExCoveralls
@@ -58,7 +59,7 @@ defmodule LexCredo.MixProject do
   defp docs do
     [
       main: "readme",
-      extras: ["README.md", "LICENSE"],
+      extras: ["README.md", "CHANGELOG.md", "LICENSE"],
       groups_for_modules: [
         "Checks – Design": ~r/LexCredo\.Check\.Design/,
         "Checks – Readability": ~r/LexCredo\.Check\.Readability/,
