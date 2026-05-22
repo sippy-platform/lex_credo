@@ -96,8 +96,17 @@ defmodule LexCredo.Check.Warning.PreferBooleanOperators do
   # Comparison operators always return a boolean.
   defp boolean_like?({op, _meta, [_left, _right]}) when op in @comparison_ops, do: true
 
-  # `not`/`!`/`and`/`or`/`&&`/`||` all produce booleans (or truthy/falsy).
-  defp boolean_like?({op, _meta, _operands}) when op in [:not, :!, :and, :or, :&&, :||], do: true
+  # `not`/`!`/`and`/`or` are strict boolean operators — they always return a boolean.
+  defp boolean_like?({op, _meta, _args}) when op in [:not, :!, :and, :or], do: true
+
+  # `&&`/`||` are truthy/falsy short-circuit operators; they are only boolean-like
+  # when at least one of their operands is boolean-like. This avoids flagging
+  # idiomatic truthy patterns like `(user && user.name) || "default"`.
+  defp boolean_like?({:&&, _meta, [left, right]}),
+    do: boolean_like?(left) or boolean_like?(right)
+
+  defp boolean_like?({:||, _meta, [left, right]}),
+    do: boolean_like?(left) or boolean_like?(right)
 
   # Literal booleans.
   defp boolean_like?(true), do: true
