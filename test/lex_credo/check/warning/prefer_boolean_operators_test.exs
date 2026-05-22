@@ -194,12 +194,13 @@ defmodule LexCredo.Check.Warning.PreferBooleanOperatorsTest do
     assert "&&" in triggers
   end
 
-  test "flags && when an operand is the literal false" do
-    # Exercises boolean_like?(false) — literal false is always boolean-typed.
+  test "flags && when right operand is the literal true" do
+    # Exercises boolean_like?(true): left operand (plain variable) is not
+    # boolean-like, so `or` does not short-circuit and the right side is reached.
     source = """
     defmodule M do
       def f(x) do
-        false && is_binary(x)
+        x && true
       end
     end
     """
@@ -208,17 +209,18 @@ defmodule LexCredo.Check.Warning.PreferBooleanOperatorsTest do
     assert issue.trigger == "&&"
   end
 
-  test "flags || when an operand is the literal false" do
+  test "flags && when right operand is the literal false" do
+    # Exercises boolean_like?(false): same reasoning as above.
     source = """
     defmodule M do
       def f(x) do
-        is_nil(x) || false
+        x && false
       end
     end
     """
 
     assert [issue] = run(source)
-    assert issue.trigger == "||"
+    assert issue.trigger == "&&"
   end
 
   test "does not flag a test file when exclude_test_files: true" do

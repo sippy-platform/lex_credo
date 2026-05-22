@@ -59,6 +59,9 @@ defmodule LexCredo.MixProject do
   defp docs do
     [
       main: "readme",
+      description:
+        "A collection of custom Credo checks for Elixir projects, designed to catch common anti-patterns.",
+      license: "MIT",
       extras: ["README.md", "CHANGELOG.md", "LICENSE"],
       groups_for_modules: [
         "Checks – Design": ~r/LexCredo\.Check\.Design/,
