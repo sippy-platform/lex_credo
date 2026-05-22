@@ -23,6 +23,7 @@
           {LexCredo.Check.Warning.NoProcessSleepInTests, []},
           {LexCredo.Check.Warning.NoEnumAllAssert, []},
           {LexCredo.Check.Warning.PreferBooleanOperators, []},
+          {LexCredo.Check.Warning.NoComplexWithElse, []},
         ],
         disabled: []
       }
