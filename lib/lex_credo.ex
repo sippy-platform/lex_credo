@@ -82,12 +82,12 @@ defmodule LexCredo do
 
   ### Readability
 
-  - `LexCredo.Check.Readability.DocExamplesSection` ⚠️ — flags `@doc` strings
+  - `LexCredo.Check.Readability.DocExamplesSection` (controversial) — flags `@doc` strings
     on public functions that are missing a `## Examples` section.
 
   ### Refactor
 
-  - `LexCredo.Check.Refactor.NoEnumWrapperFunctions` ⚠️ — flags named functions
+  - `LexCredo.Check.Refactor.NoEnumWrapperFunctions` (controversial) — flags named functions
     whose entire body is a single `Enum.*` or `Stream.*` transformation call.
 
   ### Warning
@@ -99,7 +99,7 @@ defmodule LexCredo do
     `assert Enum.all?/2` in tests; prefer a `for` loop with individual assertions
     that report the failing element.
 
-  - `LexCredo.Check.Warning.NoPipeIntoCase` ⚠️ — flags `|> case do` patterns;
+  - `LexCredo.Check.Warning.NoPipeIntoCase` (controversial) — flags `|> case do` patterns;
     bind the value to a variable first.
 
   - `LexCredo.Check.Warning.NoProcessSleepInTests` *(test files only)* — flags
@@ -109,7 +109,7 @@ defmodule LexCredo do
   - `LexCredo.Check.Warning.NoTaggedWithClauses` — flags tagged-tuple
     workarounds in `with` clauses (e.g. `{:tag, {:ok, _}} <- {:tag, expr}`).
 
-  - `LexCredo.Check.Warning.PreferBooleanOperators` ⚠️ — flags `&&`, `||`, `!`
+  - `LexCredo.Check.Warning.PreferBooleanOperators` (controversial) — flags `&&`, `||`, `!`
     when at least one operand is clearly boolean-returning; prefer `and`, `or`,
     `not`.
 
@@ -123,7 +123,7 @@ defmodule LexCredo do
 
   > #### Controversial checks {: .tip}
   >
-  > Checks marked ⚠️ reflect opinions that are actively debated in the Elixir
+  > Checks marked *(controversial)* reflect opinions that are actively debated in the Elixir
   > community. They are enabled by default because they catch real problems for
   > AI-generated code, but your team may reasonably disagree. Review and disable
   > as needed.

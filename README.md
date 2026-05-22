@@ -9,7 +9,9 @@ Anti-patterns targeted by this library are drawn primarily from:
 - [Elixir's official anti-patterns guide](https://hexdocs.pm/elixir/what-anti-patterns.html)
 - [Chris Keathley's "Good and Bad Elixir"](https://keathley.io/blog/good-and-bad-elixir.html)
 
-> ⚠️ **Checks are here to assist, not to legislate.** Some rules in this library are genuinely controversial within the Elixir community — reasonable people disagree. The goal is to nudge toward good defaults, not to enforce a single style religion. If a check doesn't fit your project's conventions, disable it. See [Disabling Checks](#disabling-checks).
+> #### Note {: .tip}
+>
+> Checks are here to assist, not to legislate. Some rules in this library are genuinely controversial within the Elixir community — reasonable people disagree. The goal is to nudge toward good defaults, not to enforce a single style religion. If a check doesn't fit your project's conventions, disable it. See [Disabling Checks](#disabling-checks).
 
 ---
 
@@ -98,11 +100,13 @@ defmodule Outer.Inner do ... end
 
 ### Readability
 
-#### `LexCredo.Check.Readability.DocExamplesSection` ⚠️
+#### `LexCredo.Check.Readability.DocExamplesSection`
 
 **Category:** Readability | **Priority:** Normal
 
-> ⚠️ **Controversial.** Requiring an `## Examples` section in every public function doc is a strong convention that not all teams share. Some functions are genuinely self-documenting. Consider disabling this check if your team finds it too prescriptive.
+> #### Controversial {: .warning}
+>
+> Requiring an `## Examples` section in every public function doc is a strong convention that not all teams share. Some functions are genuinely self-documenting. Consider disabling this check if your team finds it too prescriptive.
 
 Flags `@doc` strings on public functions that are missing an `## Examples` section. Inline examples improve discoverability and double as living documentation when used with `doctest`.
 
@@ -131,11 +135,13 @@ def parse_date(str), do: ...
 
 ### Refactor
 
-#### `LexCredo.Check.Refactor.NoEnumWrapperFunctions` ⚠️
+#### `LexCredo.Check.Refactor.NoEnumWrapperFunctions`
 
 **Category:** Refactor | **Priority:** Normal
 
-> ⚠️ **Controversial.** There are legitimate reasons to wrap an `Enum` call in a named function (naming intent, easier testing, future extensibility). This check flags only the cases where the wrapper adds no abstraction value at all. If your wrapper function carries a meaningful name that clarifies intent, disable this check or add it to an allow-list.
+> #### Controversial {: .warning}
+>
+> There are legitimate reasons to wrap an `Enum` call in a named function (naming intent, easier testing, future extensibility). This check flags only the cases where the wrapper adds no abstraction value at all. If your wrapper function carries a meaningful name that clarifies intent, disable this check or add it to an allow-list.
 
 Flags named functions (`def`/`defp`) whose entire body is a single `Enum` or `Stream` transformation call (`map`, `flat_map`, `each`, `map_reduce`, `flat_map_reduce`, `scan`). These wrappers add indirection without adding meaning — callers can compose `Enum` directly.
 
@@ -201,11 +207,13 @@ end
 
 ---
 
-#### `LexCredo.Check.Warning.NoPipeIntoCase` ⚠️
+#### `LexCredo.Check.Warning.NoPipeIntoCase`
 
 **Category:** Warning | **Priority:** High
 
-> ⚠️ **Controversial.** The `|> case do` pattern is used widely in the Elixir community and is syntactically valid. Many developers find it natural and prefer it for readability in pipelines. This check reflects the preference from [Keathley's style guide](https://keathley.io/blog/good-and-bad-elixir.html) to bind the intermediate value first so it can be inspected more easily. Disable if your team is comfortable with `|> case do`.
+> #### Controversial {: .warning}
+>
+> The `|> case do` pattern is used widely in the Elixir community and is syntactically valid. Many developers find it natural and prefer it for readability in pipelines. This check reflects the preference from [Keathley's style guide](https://keathley.io/blog/good-and-bad-elixir.html) to bind the intermediate value first so it can be inspected more easily. Disable if your team is comfortable with `|> case do`.
 
 Flags `|> case do` patterns. Binding the piped value to a named variable before branching makes the code easier to debug and the variable available for logging or pattern matching.
 
@@ -268,11 +276,13 @@ This pattern exists to work around `with`'s inability to match partial results i
 
 ---
 
-#### `LexCredo.Check.Warning.PreferBooleanOperators` ⚠️
+#### `LexCredo.Check.Warning.PreferBooleanOperators`
 
 **Category:** Warning | **Priority:** Normal
 
-> ⚠️ **Controversial.** The `&&`/`||`/`!` vs `and`/`or`/`not` distinction is one of the most debated style points in Elixir. Both sets of operators are valid in non-guard contexts. `&&`/`||` are more familiar to developers coming from other languages. This check reflects the opinion from the official anti-patterns guide that `and`/`or`/`not` should be preferred when operands are boolean-typed, since it signals intent more clearly. Disable if your team prefers `&&`/`||` uniformly.
+> #### Controversial {: .warning}
+>
+> The `&&`/`||`/`!` vs `and`/`or`/`not` distinction is one of the most debated style points in Elixir. Both sets of operators are valid in non-guard contexts. `&&`/`||` are more familiar to developers coming from other languages. This check reflects the opinion from the official anti-patterns guide that `and`/`or`/`not` should be preferred when operands are boolean-typed, since it signals intent more clearly. Disable if your team prefers `&&`/`||` uniformly.
 
 Flags `&&`, `||`, and `!` when at least one operand is a clearly boolean-yielding expression (an `is_*` guard, a comparison, a boolean literal, or another boolean operator). In these cases, `and`, `or`, and `not` are preferred.
 
