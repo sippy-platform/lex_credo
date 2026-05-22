@@ -14,6 +14,7 @@
       checks: %{
         enabled: [
           # LexCredo checks — added as each is implemented
+          {LexCredo.Check.Design.NoNestedModules, []},
         ],
         disabled: []
       }

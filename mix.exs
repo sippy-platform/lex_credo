@@ -12,6 +12,10 @@ defmodule LexCredo.MixProject do
     ]
   end
 
+  def cli do
+    [preferred_envs: [precommit: :test]]
+  end
+
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
@@ -28,7 +32,7 @@ defmodule LexCredo.MixProject do
 
   defp aliases do
     [
-      precommit: ["format", "credo --strict", "test"]
+      precommit: ["compile", "format", "credo --all", "test"]
     ]
   end
 end
