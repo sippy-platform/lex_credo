@@ -100,4 +100,24 @@ defmodule LexCredo.Check.Refactor.NoEnumWrapperFunctionsTest do
 
     assert run(source) == []
   end
+
+  test "flags a def wrapping Enum.flat_map" do
+    source = """
+    defmodule M do
+      def expand(lists), do: Enum.flat_map(lists, & &1)
+    end
+    """
+
+    assert [_issue] = run(source)
+  end
+
+  test "flags a defp wrapping Enum.map" do
+    source = """
+    defmodule M do
+      defp names(users), do: Enum.map(users, & &1.name)
+    end
+    """
+
+    assert [_issue] = run(source)
+  end
 end

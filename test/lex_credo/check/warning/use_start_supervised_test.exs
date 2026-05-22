@@ -72,6 +72,51 @@ defmodule LexCredo.Check.Warning.UseStartSupervisedTest do
     assert issue.trigger == "Supervisor.start_link"
   end
 
+  test "flags GenServer.start (without link) in a test file" do
+    source = """
+    defmodule MyTest do
+      use ExUnit.Case
+
+      test "starts server without link" do
+        {:ok, pid} = GenServer.start(MyServer, [])
+      end
+    end
+    """
+
+    assert [issue] = run(source)
+    assert issue.trigger == "GenServer.start"
+  end
+
+  test "flags Task.start_link in a test file" do
+    source = """
+    defmodule MyTest do
+      use ExUnit.Case
+
+      test "starts task" do
+        {:ok, _pid} = Task.start_link(fn -> :ok end)
+      end
+    end
+    """
+
+    assert [issue] = run(source)
+    assert issue.trigger == "Task.start_link"
+  end
+
+  test "flags DynamicSupervisor.start_link in a test file" do
+    source = """
+    defmodule MyTest do
+      use ExUnit.Case
+
+      test "starts dynamic supervisor" do
+        {:ok, _sup} = DynamicSupervisor.start_link(strategy: :one_for_one)
+      end
+    end
+    """
+
+    assert [issue] = run(source)
+    assert issue.trigger == "DynamicSupervisor.start_link"
+  end
+
   test "does not flag GenServer.start_link in a non-test file" do
     source = """
     defmodule MyApp.Application do

@@ -123,4 +123,58 @@ defmodule LexCredo.Check.Warning.PreferBooleanOperatorsTest do
 
     assert run(source) == []
   end
+
+  test "does not flag || when the inner && operands are not boolean-like" do
+    # (user && user.name) || "default" is pure truthy/falsy — should not be flagged
+    source = """
+    defmodule M do
+      def f(user) do
+        (user && user.name) || "default"
+      end
+    end
+    """
+
+    assert run(source) == []
+  end
+
+  test "does not flag && when both operands are plain variables" do
+    source = """
+    defmodule M do
+      def f(a, b) do
+        a && b
+      end
+    end
+    """
+
+    assert run(source) == []
+  end
+
+  test "flags || when the left operand is a ! expression" do
+    # !x always returns a boolean, so (!x) || y should use `or`
+    source = """
+    defmodule M do
+      def f(x, y) do
+        !x || y
+      end
+    end
+    """
+
+    assert [issue] = run(source)
+    assert issue.trigger == "||"
+  end
+
+  test "flags both the inner && and the outer || when all operands are boolean-like" do
+    source = """
+    defmodule M do
+      def f(x, y, z) do
+        (is_binary(x) && is_integer(y)) || is_atom(z)
+      end
+    end
+    """
+
+    issues = run(source)
+    triggers = Enum.map(issues, & &1.trigger)
+    assert "&&" in triggers
+    assert "||" in triggers
+  end
 end

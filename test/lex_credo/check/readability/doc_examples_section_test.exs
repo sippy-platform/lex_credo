@@ -66,6 +66,17 @@ defmodule LexCredo.Check.Readability.DocExamplesSectionTest do
     assert run(source) == []
   end
 
+  test "does not flag @doc nil" do
+    source = """
+    defmodule M do
+      @doc nil
+      def hidden, do: :hidden
+    end
+    """
+
+    assert run(source) == []
+  end
+
   test "does not flag @moduledoc" do
     source = """
     defmodule M do

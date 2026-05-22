@@ -41,6 +41,21 @@ defmodule LexCredo.Check.Warning.NoEnumAllAssertTest do
     assert issue.trigger == "Enum.all?"
   end
 
+  test "flags assert Enum.all?/1 with no predicate" do
+    source = """
+    defmodule MyTest do
+      use ExUnit.Case
+
+      test "all truthy" do
+        assert Enum.all?([1, 2, 3])
+      end
+    end
+    """
+
+    assert [issue] = run(source)
+    assert issue.trigger == "Enum.all?"
+  end
+
   test "does not flag a bare Enum.all? not wrapped in assert" do
     source = """
     defmodule MyTest do
