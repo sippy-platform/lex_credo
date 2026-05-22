@@ -10,21 +10,21 @@ defmodule LexCredo.Check.Design.NoNestedModules do
       Nested modules can cause cyclic dependencies and compilation errors.
       Each module should live in its own file.
 
-      # BAD
-      defmodule Outer do
-        defmodule Inner do
-          # ...
-        end
-      end
+          # BAD
+          defmodule Outer do
+            defmodule Inner do
+              # ...
+            end
+          end
 
-      # GOOD — separate files, separate modules
-      defmodule Outer do
-        # ...
-      end
+          # GOOD — separate files, separate modules
+          defmodule Outer do
+            # ...
+          end
 
-      defmodule Outer.Inner do
-        # ...
-      end
+          defmodule Outer.Inner do
+            # ...
+          end
       """,
       params: [
         exclude_test_files:

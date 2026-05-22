@@ -71,6 +71,50 @@ mix credo --strict
 
 ---
 
+## General Parameters
+
+All checks accept the following parameters.
+
+### `exclude_test_files`
+
+Skip test files for this check. Default is `true` for `NoNestedModules` (which
+skips test files by default to allow inline helper modules) and `false` for all
+other checks.
+
+```elixir
+# Skip test files for a check that normally runs everywhere
+{LexCredo.Check.Readability.DocExamplesSection, [exclude_test_files: true]}
+
+# Run NoNestedModules in test files too
+{LexCredo.Check.Design.NoNestedModules, [exclude_test_files: false]}
+```
+
+### Standard Credo parameters
+
+- **`false`** — disable the check entirely:
+
+  ```elixir
+  {LexCredo.Check.Warning.NoPipeIntoCase, false}
+  ```
+
+- **`exit_status`** — make a check advisory-only (reports issues but does not
+  affect the exit code):
+
+  ```elixir
+  {LexCredo.Check.Warning.PreferBooleanOperators, [exit_status: 0]}
+  ```
+
+- **`priority`** — override the check's base priority.
+
+> #### Suppressing individual warnings {: .tip}
+>
+> Use a Credo inline comment to suppress a single occurrence without disabling
+> the check globally:
+>
+>     result |> case do  # credo:disable-for-next-line LexCredo.Check.Warning.NoPipeIntoCase
+
+---
+
 ## Included Checks
 
 ### Design
@@ -347,16 +391,9 @@ checks: %{
 }
 ```
 
-To disable a check for a specific file or line, use an inline comment:
-
-```elixir
-result |> case do  # credo:disable-for-next-line LexCredo.Check.Warning.NoPipeIntoCase
-  {:ok, val} -> val
-  _ -> nil
-end
-```
-
-See the [Credo documentation on inline config](https://hexdocs.pm/credo/inline_config.html) for more options.
+See [General Parameters](#general-parameters) for per-occurrence suppression and
+the [Credo inline config documentation](https://hexdocs.pm/credo/inline_config.html)
+for all available directives.
 
 ---
 
