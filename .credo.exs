@@ -25,6 +25,7 @@
           {LexCredo.Check.Warning.PreferBooleanOperators, []},
           {LexCredo.Check.Warning.NoComplexWithElse, []},
           {LexCredo.Check.Warning.UseStartSupervised, []},
+          {LexCredo.Check.Refactor.NoEnumWrapperFunctions, []},
         ],
         disabled: []
       }
