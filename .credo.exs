@@ -20,6 +20,7 @@
           {LexCredo.Check.Warning.NoPipeIntoCase, []},
           {LexCredo.Check.Readability.DocExamplesSection, []},
           {LexCredo.Check.Warning.NoTaggedWithClauses, []},
+          {LexCredo.Check.Warning.NoProcessSleepInTests, []},
         ],
         disabled: []
       }
