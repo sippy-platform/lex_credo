@@ -18,6 +18,7 @@
           {LexCredo.Check.Warning.NoBareWildcardInCase, []},
           {LexCredo.Check.Warning.UsePositiveTypeGuards, []},
           {LexCredo.Check.Warning.NoPipeIntoCase, []},
+          {LexCredo.Check.Readability.DocExamplesSection, []},
         ],
         disabled: []
       }
