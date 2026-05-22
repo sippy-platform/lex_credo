@@ -91,17 +91,17 @@ defmodule LexCredo.Check.Warning.PreferBooleanOperators do
   defp traverse(ast, acc), do: {ast, acc}
 
   # An `is_*` guard call always returns a boolean.
-  defp boolean_like?({fun, _, _args}) when fun in @boolean_guard_fns, do: true
+  defp boolean_like?({fun, _meta, _args}) when fun in @boolean_guard_fns, do: true
 
   # Comparison operators always return a boolean.
-  defp boolean_like?({op, _, [_, _]}) when op in @comparison_ops, do: true
+  defp boolean_like?({op, _meta, [_left, _right]}) when op in @comparison_ops, do: true
 
   # `not`/`!`/`and`/`or`/`&&`/`||` all produce booleans (or truthy/falsy).
-  defp boolean_like?({op, _, _}) when op in [:not, :!, :and, :or, :&&, :||], do: true
+  defp boolean_like?({op, _meta, _operands}) when op in [:not, :!, :and, :or, :&&, :||], do: true
 
   # Literal booleans.
   defp boolean_like?(true), do: true
   defp boolean_like?(false), do: true
 
-  defp boolean_like?(_), do: false
+  defp boolean_like?(_expr), do: false
 end

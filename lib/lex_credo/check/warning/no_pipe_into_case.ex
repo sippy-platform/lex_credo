@@ -37,7 +37,10 @@ defmodule LexCredo.Check.Warning.NoPipeIntoCase do
     |> elem(0)
   end
 
-  defp traverse({:|>, meta, [_left, {:case, _, _}]} = ast, {issues, issue_meta}) do
+  defp traverse(
+         {:|>, meta, [_left, {:case, _case_meta, _case_clauses}]} = ast,
+         {issues, issue_meta}
+       ) do
     issue =
       format_issue(issue_meta,
         message:

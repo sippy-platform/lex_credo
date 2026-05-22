@@ -50,7 +50,7 @@ defmodule LexCredo.Check.Warning.NoTaggedWithClauses do
     new_issues =
       args
       |> Enum.filter(&tagged_with_clause?/1)
-      |> Enum.map(fn {:<-, clause_meta, _} ->
+      |> Enum.map(fn {:<-, clause_meta, _args} ->
         format_issue(issue_meta,
           message:
             "Do not use tagged-tuple workarounds in `with` clauses. " <>
@@ -67,9 +67,9 @@ defmodule LexCredo.Check.Warning.NoTaggedWithClauses do
 
   # Detects patterns like `{:tag, {:ok, _}} <- {:tag, expr}` or
   # `{:tag, {:error, _}} <- {:tag, expr}` where the same atom appears on both sides.
-  defp tagged_with_clause?({:<-, _meta, [{tag_left, {result, _}}, {tag_right, _expr}]})
+  defp tagged_with_clause?({:<-, _meta, [{tag_left, {result, _value}}, {tag_right, _expr}]})
        when is_atom(tag_left) and tag_left == tag_right and result in [:ok, :error],
        do: true
 
-  defp tagged_with_clause?(_), do: false
+  defp tagged_with_clause?(_clause), do: false
 end

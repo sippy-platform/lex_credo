@@ -48,7 +48,7 @@ defmodule LexCredo.Check.Warning.UseStartSupervised do
   end
 
   defp traverse(
-         {{:., meta, [{:__aliases__, _, aliases}, fun]}, _call_meta, _args} = ast,
+         {{:., meta, [{:__aliases__, _alias_meta, aliases}, fun]}, _call_meta, _args} = ast,
          {issues, issue_meta}
        ) do
     if supervised_start?(aliases, fun) do

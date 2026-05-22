@@ -39,7 +39,7 @@ defmodule LexCredo.Check.Warning.NoEnumAllAssert do
   defp traverse(
          {:assert, _assert_meta,
           [
-            {{:., dot_meta, [{:__aliases__, _, [:Enum]}, :all?]}, _call_meta, _args}
+            {{:., dot_meta, [{:__aliases__, _alias_meta, [:Enum]}, :all?]}, _call_meta, _args}
           ]} = ast,
          {issues, issue_meta}
        ) do

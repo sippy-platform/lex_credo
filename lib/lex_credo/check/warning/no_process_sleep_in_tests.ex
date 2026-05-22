@@ -44,7 +44,7 @@ defmodule LexCredo.Check.Warning.NoProcessSleepInTests do
   end
 
   defp traverse(
-         {{:., meta, [{:__aliases__, _, [:Process]}, fun]}, _, _} = ast,
+         {{:., meta, [{:__aliases__, _alias_meta, [:Process]}, fun]}, _call_meta, _args} = ast,
          {issues, issue_meta}
        )
        when fun in [:sleep, :alive?] do

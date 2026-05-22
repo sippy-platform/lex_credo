@@ -54,7 +54,7 @@ defmodule LexCredo.Check.Warning.UsePositiveTypeGuards do
   defp traverse(ast, acc), do: {ast, acc}
 
   # `not is_nil(x)` — most common form
-  defp collect_negative_nil_positions({:not, meta, [{:is_nil, _, _}]}),
+  defp collect_negative_nil_positions({:not, meta, [{:is_nil, _is_nil_meta, _is_nil_args}]}),
     do: [meta[:line]]
 
   # `x != nil` or `nil != x`
@@ -72,11 +72,11 @@ defmodule LexCredo.Check.Warning.UsePositiveTypeGuards do
     do: [meta[:line]]
 
   # Recurse through `and`/`or` compound guards so all violations are reported.
-  defp collect_negative_nil_positions({:and, _, [left, right]}),
+  defp collect_negative_nil_positions({:and, _meta, [left, right]}),
     do: collect_negative_nil_positions(left) ++ collect_negative_nil_positions(right)
 
-  defp collect_negative_nil_positions({:or, _, [left, right]}),
+  defp collect_negative_nil_positions({:or, _meta, [left, right]}),
     do: collect_negative_nil_positions(left) ++ collect_negative_nil_positions(right)
 
-  defp collect_negative_nil_positions(_), do: []
+  defp collect_negative_nil_positions(_guard), do: []
 end

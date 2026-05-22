@@ -63,15 +63,17 @@ defmodule LexCredo.Check.Refactor.NoEnumWrapperFunctions do
   defp traverse(ast, acc), do: {ast, acc}
 
   # A single-expression block unwraps transparently.
-  defp unwrap_block({:__block__, _, [single_expr]}), do: single_expr
+  defp unwrap_block({:__block__, _meta, [single_expr]}), do: single_expr
   # A multi-expression block is never a simple wrapper.
-  defp unwrap_block({:__block__, _, _multiple}), do: :multiple_expressions
+  defp unwrap_block({:__block__, _meta, _multiple}), do: :multiple_expressions
   defp unwrap_block(expr), do: expr
 
   # Enum.fun/n or Stream.fun/n calls
-  defp enum_or_stream_call?({{:., _, [{:__aliases__, _, [mod]}, fun]}, _, _args})
+  defp enum_or_stream_call?(
+         {{:., _dot_meta, [{:__aliases__, _alias_meta, [mod]}, fun]}, _call_meta, _args}
+       )
        when mod in [:Enum, :Stream] and fun in @enum_fns,
        do: true
 
-  defp enum_or_stream_call?(_), do: false
+  defp enum_or_stream_call?(_ast), do: false
 end

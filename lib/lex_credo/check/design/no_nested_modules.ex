@@ -51,7 +51,7 @@ defmodule LexCredo.Check.Design.NoNestedModules do
     new_issues =
       body
       |> immediate_defmodules()
-      |> Enum.map(fn {:defmodule, meta, _} ->
+      |> Enum.map(fn {:defmodule, meta, _children} ->
         format_issue(issue_meta,
           message: "Do not nest module definitions. Move `defmodule` to its own file instead.",
           line_no: meta[:line]
@@ -64,11 +64,11 @@ defmodule LexCredo.Check.Design.NoNestedModules do
   defp traverse(ast, acc), do: {ast, acc}
 
   # A `__block__` body can hold multiple top-level statements.
-  defp immediate_defmodules({:__block__, _, stmts}),
-    do: Enum.filter(stmts, &match?({:defmodule, _, _}, &1))
+  defp immediate_defmodules({:__block__, _meta, stmts}),
+    do: Enum.filter(stmts, &match?({:defmodule, _dm_meta, _dm_children}, &1))
 
   # A single-statement body that is itself a defmodule.
-  defp immediate_defmodules({:defmodule, _, _} = dm), do: [dm]
+  defp immediate_defmodules({:defmodule, _meta, _children} = dm), do: [dm]
 
-  defp immediate_defmodules(_), do: []
+  defp immediate_defmodules(_body), do: []
 end
