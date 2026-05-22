@@ -4,7 +4,7 @@
 [![Hex Version](https://img.shields.io/hexpm/v/lex_credo)](https://hex.pm/packages/lex_credo)
 [![Hex Downloads](https://img.shields.io/hexpm/dt/lex_credo)](https://hex.pm/packages/lex_credo)
 [![Documentation](https://img.shields.io/badge/hex-docs-purple?logo=elixir)](https://hexdocs.pm/lex_credo)
-[![Coverage Status](https://coveralls.io/repos/github/sippy-platform/lex_credo/badge.svg)](https://coveralls.io/github/sippy-platform/lex_credo)
+[![Coverage](https://codecov.io/gh/sippy-platform/lex_credo/graph/badge.svg)](https://codecov.io/gh/sippy-platform/lex_credo)
 
 A collection of custom [Credo](https://github.com/rrrene/credo) checks for Elixir projects, designed to catch common anti-patterns and guide both **human developers and AI coding agents** toward idiomatic, maintainable Elixir code.
 

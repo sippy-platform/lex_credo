@@ -27,7 +27,7 @@ defmodule LexCredo.MixProject do
         coveralls: :test,
         "coveralls.detail": :test,
         "coveralls.html": :test,
-        "coveralls.github": :test
+        "coveralls.json": :test
       ]
     ]
   end
