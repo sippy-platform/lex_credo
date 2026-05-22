@@ -21,6 +21,7 @@
           {LexCredo.Check.Readability.DocExamplesSection, []},
           {LexCredo.Check.Warning.NoTaggedWithClauses, []},
           {LexCredo.Check.Warning.NoProcessSleepInTests, []},
+          {LexCredo.Check.Warning.NoEnumAllAssert, []},
         ],
         disabled: []
       }
