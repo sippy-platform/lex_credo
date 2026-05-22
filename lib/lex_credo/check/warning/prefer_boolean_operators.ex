@@ -2,6 +2,7 @@ defmodule LexCredo.Check.Warning.PreferBooleanOperators do
   use Credo.Check,
     category: :warning,
     base_priority: :normal,
+    param_defaults: [exclude_test_files: false],
     explanations: [
       check: """
       Use `and`/`or`/`not` instead of `&&`/`||`/`!` when operands are booleans.
@@ -18,10 +19,14 @@ defmodule LexCredo.Check.Warning.PreferBooleanOperators do
           # OVER
           if is_binary(name) && is_integer(age), do: ...
           unless is_nil(x) || is_nil(y), do: ...
-      """
+      """,
+      params: [
+        exclude_test_files: "When `true`, skips test files. Default: `false`."
+      ]
     ]
 
   alias Credo.IssueMeta
+  alias LexCredo.CheckHelpers
 
   # Guard functions that always return a boolean.
   @boolean_guard_fns ~w[
@@ -37,10 +42,14 @@ defmodule LexCredo.Check.Warning.PreferBooleanOperators do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
+    if CheckHelpers.skip_for_test_file?(source_file, params, __MODULE__) do
+      []
+    else
+      issue_meta = IssueMeta.for(source_file, params)
 
-    Credo.Code.prewalk(source_file, &traverse/2, {[], issue_meta})
-    |> elem(0)
+      Credo.Code.prewalk(source_file, &traverse/2, {[], issue_meta})
+      |> elem(0)
+    end
   end
 
   defp traverse({:&&, meta, [left, right]} = ast, {issues, issue_meta}) do

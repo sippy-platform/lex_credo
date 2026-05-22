@@ -120,4 +120,19 @@ defmodule LexCredo.Check.Refactor.NoEnumWrapperFunctionsTest do
 
     assert [_issue] = run(source)
   end
+
+  test "does not flag a test file when exclude_test_files: true" do
+    source = """
+    defmodule M do
+      def names(users), do: Enum.map(users, & &1.name)
+    end
+    """
+
+    issues =
+      source
+      |> Credo.SourceFile.parse("test/support/helpers.ex")
+      |> NoEnumWrapperFunctions.run(exclude_test_files: true)
+
+    assert issues == []
+  end
 end

@@ -98,4 +98,27 @@ defmodule LexCredo.Check.Warning.NoComplexWithElseTest do
 
     assert run(source, max_else_clauses: 3) == []
   end
+
+  test "does not flag a test file when exclude_test_files: true" do
+    source = """
+    defmodule M do
+      def f(data) do
+        with {:ok, a} <- step_a(data),
+             {:ok, b} <- step_b(a) do
+          {a, b}
+        else
+          {:error, :a} -> :a
+          {:error, :b} -> :b
+        end
+      end
+    end
+    """
+
+    issues =
+      source
+      |> Credo.SourceFile.parse("test/my_test.exs")
+      |> NoComplexWithElse.run(exclude_test_files: true)
+
+    assert issues == []
+  end
 end

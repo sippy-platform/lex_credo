@@ -177,4 +177,21 @@ defmodule LexCredo.Check.Warning.PreferBooleanOperatorsTest do
     assert "&&" in triggers
     assert "||" in triggers
   end
+
+  test "does not flag a test file when exclude_test_files: true" do
+    source = """
+    defmodule M do
+      def f(a, b) do
+        if is_binary(a) && is_integer(b), do: {a, b}
+      end
+    end
+    """
+
+    issues =
+      source
+      |> Credo.SourceFile.parse("test/my_test.exs")
+      |> PreferBooleanOperators.run(exclude_test_files: true)
+
+    assert issues == []
+  end
 end

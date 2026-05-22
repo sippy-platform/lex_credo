@@ -2,6 +2,7 @@ defmodule LexCredo.Check.Warning.NoProcessSleepInTests do
   use Credo.Check,
     category: :warning,
     base_priority: :high,
+    param_defaults: [exclude_test_files: false],
     explanations: [
       check: """
       Avoid `Process.sleep/1` and `Process.alive?/1` in test files.
@@ -24,7 +25,11 @@ defmodule LexCredo.Check.Warning.NoProcessSleepInTests do
 
           # GOOD — ensure prior messages have been processed
           _ = :sys.get_state(server)
-      """
+      """,
+      params: [
+        exclude_test_files:
+          "When `true`, skips test files (effectively disabling this check). Default: `false`."
+      ]
     ]
 
   alias Credo.IssueMeta
@@ -33,7 +38,8 @@ defmodule LexCredo.Check.Warning.NoProcessSleepInTests do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    if CheckHelpers.test_file?(source_file) do
+    if CheckHelpers.test_file?(source_file) and
+         not CheckHelpers.skip_for_test_file?(source_file, params, __MODULE__) do
       issue_meta = IssueMeta.for(source_file, params)
 
       Credo.Code.prewalk(source_file, &traverse/2, {[], issue_meta})

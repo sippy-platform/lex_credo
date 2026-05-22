@@ -147,4 +147,24 @@ defmodule LexCredo.Check.Warning.UseStartSupervisedTest do
 
     assert run(source) == []
   end
+
+  test "does not flag a test file when exclude_test_files: true" do
+    source = """
+    defmodule MyTest do
+      use ExUnit.Case
+
+      test "starts server" do
+        {:ok, pid} = GenServer.start_link(MyServer, [])
+        assert is_pid(pid)
+      end
+    end
+    """
+
+    issues =
+      source
+      |> Credo.SourceFile.parse("test/my_test.exs")
+      |> UseStartSupervised.run(exclude_test_files: true)
+
+    assert issues == []
+  end
 end

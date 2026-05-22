@@ -2,6 +2,7 @@ defmodule LexCredo.Check.Design.NoNestedModules do
   use Credo.Check,
     category: :design,
     base_priority: :high,
+    param_defaults: [exclude_test_files: true],
     explanations: [
       check: """
       Do not nest module definitions inside other modules.
@@ -24,7 +25,12 @@ defmodule LexCredo.Check.Design.NoNestedModules do
       defmodule Outer.Inner do
         # ...
       end
-      """
+      """,
+      params: [
+        exclude_test_files:
+          "When `true`, skips test files. Default: `true`. " <>
+            "Set to `false` to also flag nested modules in test helpers."
+      ]
     ]
 
   alias Credo.IssueMeta
@@ -33,7 +39,7 @@ defmodule LexCredo.Check.Design.NoNestedModules do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    if CheckHelpers.test_file?(source_file) do
+    if CheckHelpers.skip_for_test_file?(source_file, params, __MODULE__) do
       []
     else
       issue_meta = IssueMeta.for(source_file, params)

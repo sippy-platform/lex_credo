@@ -98,4 +98,21 @@ defmodule LexCredo.Check.Design.NoNestedModulesTest do
 
     assert run(source, "test/support/my_test.ex") == []
   end
+
+  test "flags nested modules in test files when exclude_test_files: false" do
+    source = """
+    defmodule MyTest do
+      defmodule Helper do
+      end
+    end
+    """
+
+    issues =
+      source
+      |> Credo.SourceFile.parse("test/support/helpers.ex")
+      |> NoNestedModules.run(exclude_test_files: false)
+
+    assert [issue] = issues
+    assert issue.message =~ "Do not nest module definitions"
+  end
 end

@@ -155,4 +155,19 @@ defmodule LexCredo.Check.Warning.UsePositiveTypeGuardsTest do
 
     assert run(source) == []
   end
+
+  test "does not flag a test file when exclude_test_files: true" do
+    source = """
+    defmodule M do
+      def call(%{req: req}) when not is_nil(req), do: req
+    end
+    """
+
+    issues =
+      source
+      |> Credo.SourceFile.parse("test/my_test.exs")
+      |> UsePositiveTypeGuards.run(exclude_test_files: true)
+
+    assert issues == []
+  end
 end

@@ -2,6 +2,7 @@ defmodule LexCredo.Check.Warning.UseStartSupervised do
   use Credo.Check,
     category: :warning,
     base_priority: :normal,
+    param_defaults: [exclude_test_files: false],
     explanations: [
       check: """
       In test files, use `start_supervised!/1` to start processes instead of
@@ -19,7 +20,11 @@ defmodule LexCredo.Check.Warning.UseStartSupervised do
           # GOOD
           pid = start_supervised!(MyServer)
           agent = start_supervised!({Agent, fn -> %{} end})
-      """
+      """,
+      params: [
+        exclude_test_files:
+          "When `true`, skips test files (effectively disabling this check). Default: `false`."
+      ]
     ]
 
   alias Credo.IssueMeta
@@ -37,7 +42,8 @@ defmodule LexCredo.Check.Warning.UseStartSupervised do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    if CheckHelpers.test_file?(source_file) do
+    if CheckHelpers.test_file?(source_file) and
+         not CheckHelpers.skip_for_test_file?(source_file, params, __MODULE__) do
       issue_meta = IssueMeta.for(source_file, params)
 
       Credo.Code.prewalk(source_file, &traverse/2, {[], issue_meta})

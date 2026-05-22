@@ -2,7 +2,7 @@ defmodule LexCredo.Check.Warning.NoComplexWithElse do
   use Credo.Check,
     category: :warning,
     base_priority: :normal,
-    param_defaults: [max_else_clauses: 1],
+    param_defaults: [max_else_clauses: 1, exclude_test_files: false],
     explanations: [
       check: """
       Avoid complex `else` blocks in `with` expressions.
@@ -26,21 +26,27 @@ defmodule LexCredo.Check.Warning.NoComplexWithElse do
           defp step_b, do: ...
       """,
       params: [
-        max_else_clauses: "Maximum number of `else` clauses allowed (default: 1)."
+        max_else_clauses: "Maximum number of `else` clauses allowed (default: 1).",
+        exclude_test_files: "When `true`, skips test files. Default: `false`."
       ]
     ]
 
   alias Credo.Check.Params
   alias Credo.IssueMeta
+  alias LexCredo.CheckHelpers
 
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
-    max = Params.get(params, :max_else_clauses, __MODULE__)
+    if CheckHelpers.skip_for_test_file?(source_file, params, __MODULE__) do
+      []
+    else
+      issue_meta = IssueMeta.for(source_file, params)
+      max = Params.get(params, :max_else_clauses, __MODULE__)
 
-    Credo.Code.prewalk(source_file, &traverse(&1, &2, max), {[], issue_meta})
-    |> elem(0)
+      Credo.Code.prewalk(source_file, &traverse(&1, &2, max), {[], issue_meta})
+      |> elem(0)
+    end
   end
 
   defp traverse({:with, meta, args} = ast, {issues, issue_meta}, max) do

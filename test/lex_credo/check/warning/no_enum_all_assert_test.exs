@@ -97,4 +97,23 @@ defmodule LexCredo.Check.Warning.NoEnumAllAssertTest do
 
     assert run(source) == []
   end
+
+  test "does not flag when exclude_test_files: true" do
+    source = """
+    defmodule MyTest do
+      use ExUnit.Case
+
+      test "all valid" do
+        assert Enum.all?([1, 2, 3], fn x -> x > 0 end)
+      end
+    end
+    """
+
+    issues =
+      source
+      |> Credo.SourceFile.parse("test/my_test.exs")
+      |> NoEnumAllAssert.run(exclude_test_files: true)
+
+    assert issues == []
+  end
 end

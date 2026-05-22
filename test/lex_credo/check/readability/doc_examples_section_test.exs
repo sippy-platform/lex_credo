@@ -102,4 +102,20 @@ defmodule LexCredo.Check.Readability.DocExamplesSectionTest do
 
     assert [_issue1, _issue2] = run(source)
   end
+
+  test "does not flag a test file when exclude_test_files: true" do
+    source = """
+    defmodule MyTest do
+      @doc "No examples here."
+      def helper, do: :ok
+    end
+    """
+
+    issues =
+      source
+      |> Credo.SourceFile.parse("test/support/helpers.ex")
+      |> DocExamplesSection.run(exclude_test_files: true)
+
+    assert issues == []
+  end
 end

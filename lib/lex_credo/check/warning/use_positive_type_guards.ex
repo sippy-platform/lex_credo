@@ -2,6 +2,7 @@ defmodule LexCredo.Check.Warning.UsePositiveTypeGuards do
   use Credo.Check,
     category: :warning,
     base_priority: :high,
+    param_defaults: [exclude_test_files: false],
     explanations: [
       check: """
       Use positive type guards instead of negated type checks in function guards.
@@ -19,18 +20,26 @@ defmodule LexCredo.Check.Warning.UsePositiveTypeGuards do
 
           # GOOD: precise about what is actually expected
           def call_service(%{req: req}) when is_binary(req), do: ...
-      """
+      """,
+      params: [
+        exclude_test_files: "When `true`, skips test files. Default: `false`."
+      ]
     ]
 
   alias Credo.IssueMeta
+  alias LexCredo.CheckHelpers
 
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
+    if CheckHelpers.skip_for_test_file?(source_file, params, __MODULE__) do
+      []
+    else
+      issue_meta = IssueMeta.for(source_file, params)
 
-    Credo.Code.prewalk(source_file, &traverse/2, {[], issue_meta})
-    |> elem(0)
+      Credo.Code.prewalk(source_file, &traverse/2, {[], issue_meta})
+      |> elem(0)
+    end
   end
 
   # All built-in type-checking guard functions.

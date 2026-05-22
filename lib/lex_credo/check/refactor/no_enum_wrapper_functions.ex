@@ -2,6 +2,7 @@ defmodule LexCredo.Check.Refactor.NoEnumWrapperFunctions do
   use Credo.Check,
     category: :refactor,
     base_priority: :normal,
+    param_defaults: [exclude_test_files: false],
     explanations: [
       check: """
       Avoid writing named functions whose body is only a call to `Enum.*` or
@@ -18,10 +19,14 @@ defmodule LexCredo.Check.Refactor.NoEnumWrapperFunctions do
           # GOOD — parse_item/1 is reusable anywhere; caller composes with Enum
           defp parse_item(item), do: String.to_integer(item)
           collection |> Enum.map(&parse_item/1)
-      """
+      """,
+      params: [
+        exclude_test_files: "When `true`, skips test files. Default: `false`."
+      ]
     ]
 
   alias Credo.IssueMeta
+  alias LexCredo.CheckHelpers
 
   # Transformation functions that have a clear single-item equivalent.
   # Aggregation/predicate functions (any?, all?, count, sum, etc.) are
@@ -31,10 +36,14 @@ defmodule LexCredo.Check.Refactor.NoEnumWrapperFunctions do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
+    if CheckHelpers.skip_for_test_file?(source_file, params, __MODULE__) do
+      []
+    else
+      issue_meta = IssueMeta.for(source_file, params)
 
-    Credo.Code.prewalk(source_file, &traverse/2, {[], issue_meta})
-    |> elem(0)
+      Credo.Code.prewalk(source_file, &traverse/2, {[], issue_meta})
+      |> elem(0)
+    end
   end
 
   defp traverse(

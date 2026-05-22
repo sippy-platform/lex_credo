@@ -75,4 +75,25 @@ defmodule LexCredo.Check.Warning.NoPipeIntoCaseTest do
 
     assert run(source) == []
   end
+
+  test "does not flag a test file when exclude_test_files: true" do
+    source = """
+    defmodule M do
+      def f(x) do
+        fetch(x)
+        |> case do
+          {:ok, v} -> v
+          _err -> :error
+        end
+      end
+    end
+    """
+
+    issues =
+      source
+      |> Credo.SourceFile.parse("test/my_test.exs")
+      |> NoPipeIntoCase.run(exclude_test_files: true)
+
+    assert issues == []
+  end
 end

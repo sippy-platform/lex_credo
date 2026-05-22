@@ -91,4 +91,23 @@ defmodule LexCredo.Check.Warning.NoProcessSleepInTestsTest do
     assert [issue] = run(source, "test/support/helpers.ex")
     assert issue.message =~ "Process.sleep"
   end
+
+  test "does not flag a test file when exclude_test_files: true" do
+    source = """
+    defmodule MyTest do
+      use ExUnit.Case
+
+      test "bad" do
+        Process.sleep(100)
+      end
+    end
+    """
+
+    issues =
+      source
+      |> Credo.SourceFile.parse("test/my_test.exs")
+      |> NoProcessSleepInTests.run(exclude_test_files: true)
+
+    assert issues == []
+  end
 end

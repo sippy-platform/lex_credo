@@ -2,6 +2,7 @@ defmodule LexCredo.Check.Readability.DocExamplesSection do
   use Credo.Check,
     category: :readability,
     base_priority: :normal,
+    param_defaults: [exclude_test_files: false],
     explanations: [
       check: """
       Every `@doc` string on a public function should include a `## Examples` section.
@@ -27,18 +28,26 @@ defmodule LexCredo.Check.Readability.DocExamplesSection do
 
           \"""
           def add(a, b), do: a + b
-      """
+      """,
+      params: [
+        exclude_test_files: "When `true`, skips test files. Default: `false`."
+      ]
     ]
 
   alias Credo.IssueMeta
+  alias LexCredo.CheckHelpers
 
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
+    if CheckHelpers.skip_for_test_file?(source_file, params, __MODULE__) do
+      []
+    else
+      issue_meta = IssueMeta.for(source_file, params)
 
-    Credo.Code.prewalk(source_file, &traverse/2, {[], issue_meta})
-    |> elem(0)
+      Credo.Code.prewalk(source_file, &traverse/2, {[], issue_meta})
+      |> elem(0)
+    end
   end
 
   # @doc "string" or @doc """..."""  — skip @doc false / @doc nil

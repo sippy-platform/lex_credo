@@ -2,6 +2,7 @@ defmodule LexCredo.Check.Warning.NoEnumAllAssert do
   use Credo.Check,
     category: :warning,
     base_priority: :normal,
+    param_defaults: [exclude_test_files: false],
     explanations: [
       check: """
       Avoid `assert Enum.all?/2` in test files. Use `for` with individual
@@ -16,7 +17,11 @@ defmodule LexCredo.Check.Warning.NoEnumAllAssert do
 
           # GOOD — reports exactly which element failed
           for post <- posts, do: assert %Post{} = post
-      """
+      """,
+      params: [
+        exclude_test_files:
+          "When `true`, skips test files (effectively disabling this check). Default: `false`."
+      ]
     ]
 
   alias Credo.IssueMeta
@@ -25,7 +30,8 @@ defmodule LexCredo.Check.Warning.NoEnumAllAssert do
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    if CheckHelpers.test_file?(source_file) do
+    if CheckHelpers.test_file?(source_file) and
+         not CheckHelpers.skip_for_test_file?(source_file, params, __MODULE__) do
       issue_meta = IssueMeta.for(source_file, params)
 
       Credo.Code.prewalk(source_file, &traverse/2, {[], issue_meta})
