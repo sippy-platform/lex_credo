@@ -213,7 +213,7 @@ Enum.map(users, &name_of/1)
 Flags `with` expressions whose `else` block has more than `max_else_clauses` clauses (default: `1`). Complex `else` blocks usually signal that error normalisation should happen in a helper or that a `case` expression is more appropriate.
 
 ```elixir
-# flagged (2 else clauses, default max is 1)
+# flagged — 2 else clauses, default max is 1
 with {:ok, user} <- fetch_user(id),
      {:ok, post} <- fetch_post(user) do
   post
@@ -222,7 +222,14 @@ else
   {:error, :forbidden} -> {:error, :access_denied}
 end
 
-# preferred — normalise errors upstream or use a helper
+# preferred — each function returns a normalised error atom,
+# so a single catch-all clause in else is sufficient
+with {:ok, user} <- fetch_user(id),
+     {:ok, post} <- fetch_post(user) do
+  post
+else
+  {:error, reason} -> {:error, reason}
+end
 ```
 
 **Configuration:**
@@ -306,17 +313,27 @@ assert_receive {:DOWN, ^ref, :process, ^pid, _reason}
 Flags the tagged-tuple workaround used to identify which `with` clause failed in the `else` block:
 
 ```elixir
-# flagged
+# flagged — tags exist only to tell apart which step failed
 with {:user, {:ok, user}} <- {:user, fetch_user(id)},
      {:post, {:ok, post}} <- {:post, fetch_post(user)} do
-  ...
+  {:ok, post}
 else
-  {:user, {:error, reason}} -> ...
-  {:post, {:error, reason}} -> ...
+  {:user, {:error, reason}} -> {:error, {:user, reason}}
+  {:post, {:error, reason}} -> {:error, {:post, reason}}
+end
+
+# preferred — each function returns a distinct error atom,
+# so the step that failed is clear without wrapping tuples
+with {:ok, user} <- fetch_user(id),
+     {:ok, post} <- fetch_post(user) do
+  {:ok, post}
+else
+  {:error, :user_not_found} = err -> err
+  {:error, :post_not_found} = err -> err
 end
 ```
 
-This pattern exists to work around `with`'s inability to match partial results in `else`. Prefer extracting steps into functions that return normalised errors, or use `case` chains.
+This pattern exists to work around `with`'s inability to match partial results in `else`. Prefer having each function return a distinct, self-describing error tuple so no wrapping is needed.
 
 ---
 
@@ -331,16 +348,20 @@ This pattern exists to work around `with`'s inability to match partial results i
 Flags `&&`, `||`, and `!` when at least one operand is a clearly boolean-yielding expression (an `is_*` guard, a comparison, a boolean literal, or another boolean operator). In these cases, `and`, `or`, and `not` are preferred.
 
 ```elixir
-# flagged
+# flagged — operands are boolean-typed
 is_binary(x) && is_integer(y)
+has_permission?(user) || is_admin?(user)
 !is_nil(value)
 
 # preferred
 is_binary(x) and is_integer(y)
+has_permission?(user) or is_admin?(user)
 not is_nil(value)
-```
 
-> Does **not** flag `&&`/`||` used with arbitrary truthy/falsy values (the short-circuit idiom), so `user && user.name` is left alone.
+# not flagged — truthy/falsy short-circuit idiom, not boolean-typed
+user && user.name
+config[:timeout] || 5_000
+```
 
 ---
 

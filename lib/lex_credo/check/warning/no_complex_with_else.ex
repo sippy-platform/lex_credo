@@ -12,18 +12,23 @@ defmodule LexCredo.Check.Warning.NoComplexWithElse do
       focuses only on the happy path. If you genuinely need to distinguish error
       sources, use `case` instead.
 
-          # BAD — hard to tell which clause produced which error
-          with {:ok, a} <- step_a(),
-               {:ok, b} <- step_b() do
-            ...
+          # BAD — 2 else clauses, default max is 1
+          with {:ok, user} <- fetch_user(id),
+               {:ok, post} <- fetch_post(user) do
+            post
           else
-            {:error, :not_found} -> ...
-            {:error, :forbidden} -> ...
+            {:error, :not_found} -> {:error, :user_not_found}
+            {:error, :forbidden} -> {:error, :access_denied}
           end
 
-          # GOOD — each helper normalises its own error
-          defp step_a, do: ...
-          defp step_b, do: ...
+          # GOOD — each function returns a normalised error atom,
+          # so a single catch-all clause in else is sufficient
+          with {:ok, user} <- fetch_user(id),
+               {:ok, post} <- fetch_post(user) do
+            post
+          else
+            {:error, reason} -> {:error, reason}
+          end
       """,
       params: [
         max_else_clauses: "Maximum number of `else` clauses allowed (default: 1).",

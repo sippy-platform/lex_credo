@@ -12,13 +12,19 @@ defmodule LexCredo.Check.Warning.PreferBooleanOperators do
       and `!` when at least one operand is clearly boolean-returning — i.e. an
       `is_*` guard call, a comparison operator, or another boolean operator.
 
-          # PREFER
-          if is_binary(name) and is_integer(age), do: ...
-          unless is_nil(x) or is_nil(y), do: ...
+          # BAD — operands are boolean-typed
+          is_binary(x) && is_integer(y)
+          has_permission?(user) || is_admin?(user)
+          !is_nil(value)
 
-          # OVER
-          if is_binary(name) && is_integer(age), do: ...
-          unless is_nil(x) || is_nil(y), do: ...
+          # GOOD
+          is_binary(x) and is_integer(y)
+          has_permission?(user) or is_admin?(user)
+          not is_nil(value)
+
+          # NOT flagged — truthy/falsy short-circuit idiom, not boolean-typed
+          user && user.name
+          config[:timeout] || 5_000
       """,
       params: [
         exclude_test_files: "When `true`, skips test files. Default: `false`."

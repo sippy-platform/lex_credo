@@ -12,26 +12,23 @@ defmodule LexCredo.Check.Warning.NoTaggedWithClauses do
       instead. If you do not need to distinguish, normalise error return types
       in small private helper functions.
 
-          # BAD — tagging each clause so the else block can identify the source
-          with {:service, {:ok, resp}} <- {:service, call_service(data)},
-               {:decode, {:ok, decoded}} <- {:decode, Jason.decode(resp)} do
-            :ok
+          # BAD — tags exist only to tell apart which step failed
+          with {:user, {:ok, user}} <- {:user, fetch_user(id)},
+               {:post, {:ok, post}} <- {:post, fetch_post(user)} do
+            {:ok, post}
           else
-            {:service, {:error, e}} -> handle_service_error(e)
-            {:decode, {:error, e}} -> handle_decode_error(e)
+            {:user, {:error, reason}} -> {:error, {:user, reason}}
+            {:post, {:error, reason}} -> {:error, {:post, reason}}
           end
 
-          # GOOD — normalise errors in helpers and let with focus on the happy path
-          with {:ok, resp} <- call_service(data),
-               {:ok, decoded} <- decode(resp) do
-            :ok
-          end
-
-          defp decode(resp) do
-            case Jason.decode(resp) do
-              {:ok, _} = ok -> ok
-              {:error, reason} -> {:error, {:decode, reason}}
-            end
+          # GOOD — each function returns a distinct error atom,
+          # so the step that failed is clear without wrapping tuples
+          with {:ok, user} <- fetch_user(id),
+               {:ok, post} <- fetch_post(user) do
+            {:ok, post}
+          else
+            {:error, :user_not_found} = err -> err
+            {:error, :post_not_found} = err -> err
           end
       """,
       params: [
