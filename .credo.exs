@@ -22,6 +22,7 @@
           {LexCredo.Check.Warning.NoTaggedWithClauses, []},
           {LexCredo.Check.Warning.NoProcessSleepInTests, []},
           {LexCredo.Check.Warning.NoEnumAllAssert, []},
+          {LexCredo.Check.Warning.PreferBooleanOperators, []},
         ],
         disabled: []
       }
