@@ -21,6 +21,40 @@ defmodule LexCredo.Check.Warning.UsePositiveTypeGuardsTest do
     assert issue.trigger == "not is_nil"
   end
 
+  test "flags `when not is_binary(x)` in a def" do
+    source = """
+    defmodule M do
+      def validate(x) when not is_binary(x), do: {:error, :not_a_string}
+    end
+    """
+
+    assert [issue] = run(source)
+    assert issue.message =~ "positive type guard"
+    assert issue.trigger == "not is_binary"
+  end
+
+  test "flags `when not is_integer(x)` in a def" do
+    source = """
+    defmodule M do
+      def validate(x) when not is_integer(x), do: {:error, :not_an_integer}
+    end
+    """
+
+    assert [issue] = run(source)
+    assert issue.trigger == "not is_integer"
+  end
+
+  test "flags `when not is_atom(x)` in a def" do
+    source = """
+    defmodule M do
+      def f(x) when not is_atom(x), do: x
+    end
+    """
+
+    assert [issue] = run(source)
+    assert issue.trigger == "not is_atom"
+  end
+
   test "flags `when x != nil` in a def" do
     source = """
     defmodule M do
@@ -30,6 +64,7 @@ defmodule LexCredo.Check.Warning.UsePositiveTypeGuardsTest do
 
     assert [issue] = run(source)
     assert issue.message =~ "positive type guard"
+    assert issue.trigger == "!= nil"
   end
 
   test "flags `when nil != x` in a def" do
@@ -49,7 +84,8 @@ defmodule LexCredo.Check.Warning.UsePositiveTypeGuardsTest do
     end
     """
 
-    assert [_issue] = run(source)
+    assert [issue] = run(source)
+    assert issue.trigger == "!== nil"
   end
 
   test "flags `when not is_nil(x)` in a defp" do
@@ -65,14 +101,16 @@ defmodule LexCredo.Check.Warning.UsePositiveTypeGuardsTest do
   test "flags each violation in a compound `and` guard" do
     source = """
     defmodule M do
-      def f(a, b) when not is_nil(a) and not is_nil(b), do: {a, b}
+      def f(a, b) when not is_nil(a) and not is_binary(b), do: {a, b}
     end
     """
 
-    assert [_issue1, _issue2] = run(source)
+    assert [issue1, issue2] = run(source)
+    assert issue1.trigger == "not is_nil"
+    assert issue2.trigger == "not is_binary"
   end
 
-  test "flags a negative nil check combined with a valid guard via `and`" do
+  test "flags a mixed negated type guard combined with a valid guard via `and`" do
     source = """
     defmodule M do
       def f(x) when is_integer(x) and x != nil, do: x
@@ -93,7 +131,7 @@ defmodule LexCredo.Check.Warning.UsePositiveTypeGuardsTest do
     assert run(source) == []
   end
 
-  test "does not flag a `when` guard with no nil check" do
+  test "does not flag a `when` guard with no negation" do
     source = """
     defmodule M do
       def call(x) when is_integer(x) and x > 0, do: x
@@ -103,13 +141,13 @@ defmodule LexCredo.Check.Warning.UsePositiveTypeGuardsTest do
     assert run(source) == []
   end
 
-  test "does not flag nil checks in case guards (only function heads)" do
+  test "does not flag negated type guards in case guards (only function heads)" do
     source = """
     defmodule M do
       def f(x) do
         case x do
           v when not is_nil(v) -> v
-          _ -> nil
+          _other -> nil
         end
       end
     end
