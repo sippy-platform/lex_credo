@@ -71,8 +71,6 @@ defmodule LexCredo.Check.Refactor.NoEnumWrapperFunctions do
 
   defp traverse(ast, acc), do: {ast, acc}
 
-  # A single-expression block unwraps transparently.
-  defp unwrap_block({:__block__, _meta, [single_expr]}), do: single_expr
   # A multi-expression block is never a simple wrapper.
   defp unwrap_block({:__block__, _meta, _multiple}), do: :multiple_expressions
   defp unwrap_block(expr), do: expr

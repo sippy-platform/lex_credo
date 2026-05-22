@@ -156,6 +156,31 @@ defmodule LexCredo.Check.Warning.UsePositiveTypeGuardsTest do
     assert run(source) == []
   end
 
+  test "flags `when nil !== x` in a def" do
+    # Exercises the {:!==, meta, [nil, _right]} clause — nil on the left side.
+    source = """
+    defmodule M do
+      def call(x) when nil !== x, do: x
+    end
+    """
+
+    assert [issue] = run(source)
+    assert issue.trigger == "!== nil"
+  end
+
+  test "flags each violation in a compound `or` guard" do
+    # Exercises collect_negated_type_guard_positions({:or, ...}) recursion.
+    source = """
+    defmodule M do
+      def f(a, b) when not is_nil(a) or not is_binary(b), do: {a, b}
+    end
+    """
+
+    assert [issue1, issue2] = run(source)
+    assert issue1.trigger == "not is_nil"
+    assert issue2.trigger == "not is_binary"
+  end
+
   test "does not flag a test file when exclude_test_files: true" do
     source = """
     defmodule M do

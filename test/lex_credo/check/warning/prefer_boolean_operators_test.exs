@@ -178,6 +178,49 @@ defmodule LexCredo.Check.Warning.PreferBooleanOperatorsTest do
     assert "||" in triggers
   end
 
+  test "flags && when left operand is a boolean-like || subexpression" do
+    # Exercises boolean_like?({:||, ...}) — || is an operand of &&, so it
+    # must itself be checked for boolean-likeness recursively.
+    source = """
+    defmodule M do
+      def f(a, b, c) do
+        (is_nil(a) || is_atom(b)) && is_binary(c)
+      end
+    end
+    """
+
+    issues = run(source)
+    triggers = Enum.map(issues, & &1.trigger)
+    assert "&&" in triggers
+  end
+
+  test "flags && when an operand is the literal false" do
+    # Exercises boolean_like?(false) — literal false is always boolean-typed.
+    source = """
+    defmodule M do
+      def f(x) do
+        false && is_binary(x)
+      end
+    end
+    """
+
+    assert [issue] = run(source)
+    assert issue.trigger == "&&"
+  end
+
+  test "flags || when an operand is the literal false" do
+    source = """
+    defmodule M do
+      def f(x) do
+        is_nil(x) || false
+      end
+    end
+    """
+
+    assert [issue] = run(source)
+    assert issue.trigger == "||"
+  end
+
   test "does not flag a test file when exclude_test_files: true" do
     source = """
     defmodule M do
