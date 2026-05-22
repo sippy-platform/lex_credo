@@ -17,6 +17,7 @@
           {LexCredo.Check.Design.NoNestedModules, []},
           {LexCredo.Check.Warning.NoBareWildcardInCase, []},
           {LexCredo.Check.Warning.UsePositiveTypeGuards, []},
+          {LexCredo.Check.Warning.NoPipeIntoCase, []},
         ],
         disabled: []
       }
