@@ -15,6 +15,7 @@
         enabled: [
           # LexCredo checks — added as each is implemented
           {LexCredo.Check.Design.NoNestedModules, []},
+          {LexCredo.Check.Warning.NoBareWildcardInCase, []},
         ],
         disabled: []
       }
