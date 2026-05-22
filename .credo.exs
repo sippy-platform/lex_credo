@@ -19,6 +19,7 @@
           {LexCredo.Check.Warning.UsePositiveTypeGuards, []},
           {LexCredo.Check.Warning.NoPipeIntoCase, []},
           {LexCredo.Check.Readability.DocExamplesSection, []},
+          {LexCredo.Check.Warning.NoTaggedWithClauses, []},
         ],
         disabled: []
       }
