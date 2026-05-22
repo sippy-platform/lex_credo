@@ -1,6 +1,8 @@
 defmodule LexCredo.MixProject do
   use Mix.Project
 
+  @source_url "https://github.com/sippy-platform/lex_credo"
+
   def project do
     [
       app: :lex_credo,
@@ -9,10 +11,13 @@ defmodule LexCredo.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       aliases: aliases(),
+      package: package(),
 
       # ExDoc
       name: "LexCredo",
-      source_url: "https://github.com/sippy-platform/lex_credo",
+      description:
+        "A collection of custom Credo checks for Elixir projects, designed to catch common anti-patterns.",
+      source_url: @source_url,
       docs: docs(),
 
       # ExCoveralls
@@ -59,9 +64,6 @@ defmodule LexCredo.MixProject do
   defp docs do
     [
       main: "readme",
-      description:
-        "A collection of custom Credo checks for Elixir projects, designed to catch common anti-patterns.",
-      license: "MIT",
       extras: ["README.md", "CHANGELOG.md", "LICENSE"],
       groups_for_modules: [
         "Checks – Design": ~r/LexCredo\.Check\.Design/,
@@ -69,6 +71,14 @@ defmodule LexCredo.MixProject do
         "Checks – Refactor": ~r/LexCredo\.Check\.Refactor/,
         "Checks – Warning": ~r/LexCredo\.Check\.Warning/
       ]
+    ]
+  end
+
+  defp package() do
+    [
+      maintainers: ["Timothy Vanderaerden"],
+      licenses: ["MIT"],
+      links: %{"GitHub" => @source_url}
     ]
   end
 end
