@@ -10,14 +10,14 @@ defmodule LexCredo.Check.Warning.NonBooleanWithStrictOperatorTest do
   end
 
   # ---------------------------------------------------------------------------
-  # Flags `and`
+  # Flags `and` — non-boolean atom or literal on either side
   # ---------------------------------------------------------------------------
 
-  test "flags and when right operand is a non-? field access" do
+  test "flags and when right operand is a non-boolean atom (:ok)" do
     source = """
     defmodule M do
-      def f(accounts, number) do
-        Enum.find_value(accounts, &(&1.extension.exten == number and &1.id))
+      def f(data) do
+        process(data) and :ok
       end
     end
     """
@@ -27,19 +27,21 @@ defmodule LexCredo.Check.Warning.NonBooleanWithStrictOperatorTest do
     assert issue.message =~ "&&"
   end
 
-  test "flags and when left operand is a non-? field access" do
+  test "flags and when left operand is nil" do
     source = """
     defmodule M do
-      def f(user) do
-        user.name and is_valid?(user)
+      def f(condition) do
+        nil and condition
       end
     end
     """
 
-    assert [_issue] = run(source)
+    assert [issue] = run(source)
+    assert issue.trigger == "and"
   end
 
-  test "flags and when right operand is a non-boolean integer literal" do
+  test "flags and when right operand is an integer literal" do
+    # Exercises the integer-literal branch of clearly_non_boolean?/1.
     source = """
     defmodule M do
       def f(x) do
@@ -48,30 +50,20 @@ defmodule LexCredo.Check.Warning.NonBooleanWithStrictOperatorTest do
     end
     """
 
-    assert [_issue] = run(source)
-  end
-
-  test "flags and when right operand is the nil atom" do
-    source = """
-    defmodule M do
-      def f(condition) do
-        condition and nil
-      end
-    end
-    """
-
-    assert [_issue] = run(source)
+    assert [issue] = run(source)
+    assert issue.trigger == "and"
   end
 
   # ---------------------------------------------------------------------------
-  # Flags `or`
+  # Flags `or` — non-boolean atom or literal on either side
   # ---------------------------------------------------------------------------
 
-  test "flags or when an operand is a non-? field access" do
+  test "flags or when right operand is a string literal (fallback pattern)" do
+    # A common mistake: `value or "default"` should use `||`.
     source = """
     defmodule M do
-      def f(a) do
-        is_nil(a) or a.value
+      def f(env_var) do
+        env_var or "default"
       end
     end
     """
@@ -81,15 +73,28 @@ defmodule LexCredo.Check.Warning.NonBooleanWithStrictOperatorTest do
     assert issue.message =~ "||"
   end
 
-  # ---------------------------------------------------------------------------
-  # Flags `not`
-  # ---------------------------------------------------------------------------
-
-  test "flags not when operand is a non-? field access" do
+  test "flags or when right operand is a non-boolean atom (:error)" do
     source = """
     defmodule M do
-      def f(x) do
-        not x.name
+      def f(result) do
+        result or :error
+      end
+    end
+    """
+
+    assert [issue] = run(source)
+    assert issue.trigger == "or"
+  end
+
+  # ---------------------------------------------------------------------------
+  # Flags `not` — non-boolean atom or literal as operand
+  # ---------------------------------------------------------------------------
+
+  test "flags not when operand is nil" do
+    source = """
+    defmodule M do
+      def f do
+        not nil
       end
     end
     """
@@ -99,15 +104,29 @@ defmodule LexCredo.Check.Warning.NonBooleanWithStrictOperatorTest do
     assert issue.message =~ "!"
   end
 
-  # ---------------------------------------------------------------------------
-  # Does NOT flag
-  # ---------------------------------------------------------------------------
-
-  test "does not flag and when both operands are boolean guard calls" do
+  test "flags not when operand is a non-boolean atom" do
     source = """
     defmodule M do
-      def f(x, y) do
-        is_binary(x) and is_integer(y)
+      def f do
+        not :ok
+      end
+    end
+    """
+
+    assert [issue] = run(source)
+    assert issue.trigger == "not"
+  end
+
+  # ---------------------------------------------------------------------------
+  # Does NOT flag — field access (type cannot be determined statically)
+  # ---------------------------------------------------------------------------
+
+  test "does not flag and when operand is a boolean field without ? suffix" do
+    # user.active is a common Ecto boolean field — should not be flagged.
+    source = """
+    defmodule M do
+      def f(user) do
+        user.active and is_admin?(user)
       end
     end
     """
@@ -115,11 +134,43 @@ defmodule LexCredo.Check.Warning.NonBooleanWithStrictOperatorTest do
     assert run(source) == []
   end
 
-  test "does not flag and when operand is a ?-suffixed field access" do
+  test "does not flag and when left is a chained field access (real-world example)" do
+    # data.settings.announce_member_count is a boolean toggle field.
     source = """
     defmodule M do
-      def f(user) do
-        user.active? and is_admin?(user)
+      def f(data, member_count) do
+        if data.settings.announce_member_count and member_count >= data.settings.announce_member_count_minimum do
+          :ok
+        end
+      end
+    end
+    """
+
+    assert run(source) == []
+  end
+
+  test "does not flag and when right operand is a field access (Enum.find_value pattern)" do
+    # &1.id is a field access — type unknown statically.
+    source = """
+    defmodule M do
+      def f(accounts, number) do
+        Enum.find_value(accounts, &(&1.extension.exten == number and &1.id))
+      end
+    end
+    """
+
+    assert run(source) == []
+  end
+
+  # ---------------------------------------------------------------------------
+  # Does NOT flag — boolean expressions, variables, unknown calls
+  # ---------------------------------------------------------------------------
+
+  test "does not flag and when both operands are boolean guard calls" do
+    source = """
+    defmodule M do
+      def f(x, y) do
+        is_binary(x) and is_integer(y)
       end
     end
     """
@@ -139,18 +190,6 @@ defmodule LexCredo.Check.Warning.NonBooleanWithStrictOperatorTest do
     assert run(source) == []
   end
 
-  test "does not flag or with plain variables" do
-    source = """
-    defmodule M do
-      def f(a, b) do
-        a or b
-      end
-    end
-    """
-
-    assert run(source) == []
-  end
-
   test "does not flag not with a boolean guard call" do
     source = """
     defmodule M do
@@ -163,7 +202,7 @@ defmodule LexCredo.Check.Warning.NonBooleanWithStrictOperatorTest do
     assert run(source) == []
   end
 
-  test "does not flag and when left operand is a module-qualified call" do
+  test "does not flag and when operand is an unknown function call" do
     source = """
     defmodule M do
       def f(condition) do
@@ -175,11 +214,15 @@ defmodule LexCredo.Check.Warning.NonBooleanWithStrictOperatorTest do
     assert run(source) == []
   end
 
+  # ---------------------------------------------------------------------------
+  # Test-file exclusion
+  # ---------------------------------------------------------------------------
+
   test "does not flag when exclude_test_files: true and file is a test file" do
     source = """
     defmodule M do
-      def f(accounts, number) do
-        Enum.find_value(accounts, &(&1.extension.exten == number and &1.id))
+      def f(result) do
+        result or :error
       end
     end
     """

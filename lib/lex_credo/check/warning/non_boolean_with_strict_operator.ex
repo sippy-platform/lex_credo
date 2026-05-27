@@ -5,40 +5,43 @@ defmodule LexCredo.Check.Warning.NonBooleanWithStrictOperator do
     param_defaults: [exclude_test_files: false],
     explanations: [
       check: """
-      Use `&&`/`||`/`!` instead of `and`/`or`/`not` when an operand is clearly non-boolean.
+      Use `&&`/`||`/`!` instead of `and`/`or`/`not` when an operand is a
+      clearly non-boolean value.
 
-      The strict boolean operators `and`, `or`, and `not` raise an `ArgumentError` at
-      runtime if the left operand is not exactly `true` or `false`. They also signal to
-      readers that the expression is purely boolean. When an operand is a struct field
-      access (without a `?` suffix), a non-boolean literal, or `nil`, using `and`/`or`/`not`
-      will either crash at runtime or silently mislead — `&&`/`||`/`!` are the correct
-      operators for truthy/falsy short-circuit logic.
+      The strict boolean operators raise an `ArgumentError` at runtime if the
+      left operand is not exactly `true` or `false`. When an operand is a
+      non-boolean literal (integer, float, string) or a non-boolean atom such
+      as `nil`, `:ok`, or `:error`, the expression is truthy/falsy short-circuit
+      logic and `&&`/`||`/`!` are the correct operators.
 
-      This check is the complement of `PreferBooleanOperators`, which flags `&&`/`||`/`!`
-      when both operands are clearly boolean.
+      This check is intentionally narrow: struct field accesses (e.g.
+      `user.active`) and unknown function calls are **not** flagged because
+      their types cannot be determined statically, and boolean fields without
+      a `?` suffix are common in Elixir (e.g. Ecto schemas).
 
-          # BAD — right side returns an ID (non-boolean); use &&
-          Enum.find_value(accounts, &(&1.extension.exten == number and &1.id))
+      This check is the complement of `PreferBooleanOperators`, which flags
+      `&&`/`||`/`!` when both operands are clearly boolean.
 
-          # BAD — left side is a string field that can be nil; and raises at runtime
-          user.name and is_valid?(user)
+          # BAD — right operand is a non-boolean atom; and/or raises or misleads
+          process(data) and :ok
+          result or :error
 
-          # BAD — not requires a boolean argument; use !
-          not user.name
+          # BAD — string used as a fallback with or; use ||
+          env_var or "default"
+
+          # BAD — not requires a boolean argument; nil/atoms are not booleans
+          not nil
 
           # GOOD
-          &1.extension.exten == number && &1.id
-          user.name && is_valid?(user)
-          !user.name
+          process(data) && :ok
+          result || :error
+          env_var || "default"
+          !nil
 
-          # NOT flagged — ?-suffixed field follows Elixir's boolean-returning convention
-          user.active? and is_admin?(user)
-
-          # NOT flagged — plain variables; type cannot be determined statically
-          a and b
-
-          # NOT flagged — module-qualified call; return type unknown
-          MyModule.fetch() and condition
+          # NOT flagged — field access; type cannot be determined statically
+          # (user.active is a common boolean field pattern in Ecto schemas)
+          user.active and is_admin?(user)
+          exten == number and record.id
       """,
       params: [
         exclude_test_files: "When `true`, skips test files. Default: `false`."
@@ -103,25 +106,15 @@ defmodule LexCredo.Check.Warning.NonBooleanWithStrictOperator do
 
   defp traverse(ast, acc), do: {ast, acc}
 
-  # Module-qualified calls (Map.new(), Enum.count(list), etc.) — return type unknown;
-  # must come before the field-access clause because module references use the same
-  # dot-call AST shape.
-  defp clearly_non_boolean?({{:., _, [{:__aliases__, _, _}, _]}, _, _}), do: false
-
-  # Field/property access where the field name does NOT end with `?`.
-  # Elixir convention: a `?` suffix signals a boolean-returning function/field.
-  # Covers: user.name, &1.id, record.exten, but NOT user.active? or user.valid?.
-  defp clearly_non_boolean?({{:., _, [_receiver, field]}, _, []})
-       when is_atom(field),
-       do: not String.ends_with?(Atom.to_string(field), "?")
-
   # Non-boolean literals: integers, floats, and strings are never booleans.
   defp clearly_non_boolean?(x) when is_integer(x) or is_float(x) or is_binary(x), do: true
 
   # Non-boolean atoms: nil, :ok, :error, and any other atom that is not true/false.
   defp clearly_non_boolean?(x) when is_atom(x) and x != true and x != false, do: true
 
-  # Everything else (plain variables, user-defined calls, comparisons, etc.):
-  # type cannot be determined statically, so we do not flag.
+  # Everything else (variables, function calls, field accesses, comparisons, etc.):
+  # type cannot be determined statically, so we do not flag. In particular,
+  # struct field accesses such as `user.active` are left alone — boolean fields
+  # without a `?` suffix are common in Elixir (e.g. Ecto schemas).
   defp clearly_non_boolean?(_), do: false
 end
