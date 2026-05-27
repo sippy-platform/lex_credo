@@ -97,13 +97,13 @@ defmodule LexCredo.Check.Readability.DocExamplesSection do
        )
        when def_type in @all_def_types do
     new_issues =
-      if def_type not in skip_def_types do
+      if def_type in skip_def_types do
+        []
+      else
         case def_name_arity(head) do
           {name, arity} -> check_pending_doc(pending, name, arity, issue_meta)
           nil -> []
         end
-      else
-        []
       end
 
     {ast, {new_issues ++ issues, nil, issue_meta}}

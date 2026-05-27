@@ -83,6 +83,7 @@ defmodule LexCredo.Check.Warning.StructMatchInFunctionHead do
   defp plain_param_names({:when, _meta, [actual_head | _guards]}),
     do: plain_param_names(actual_head)
 
+  # credo:disable-for-next-line LexCredo.Check.Refactor.NoEnumWrapperFunctions
   defp plain_param_names({_fn_name, _meta, args}) when is_list(args),
     do: Enum.flat_map(args, &extract_variable/1)
 
@@ -128,7 +129,7 @@ defmodule LexCredo.Check.Warning.StructMatchInFunctionHead do
 
   # `%Alias.Module{}` — standard aliased struct.
   defp struct_name({:%, _meta, [{:__aliases__, _am, mod_parts}, {:%{}, _mm, _fields}]}),
-    do: mod_parts |> Enum.map(&Atom.to_string/1) |> Enum.join(".")
+    do: Enum.map_join(mod_parts, ".", &Atom.to_string/1)
 
   # `%__MODULE__{}` — current-module reference.
   defp struct_name({:%, _meta, [{:__MODULE__, _mm, _ctx}, {:%{}, _mm2, _fields}]}),
