@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- `LexCredo.Check.Warning.NoPipeIntoCase` — superseded by the built-in
+  `Credo.Check.Readability.BlockPipe`, which covers `|>` into any block
+  expression, not just `case`. Enable `BlockPipe` in `.credo.exs` instead.
+- `LexCredo.Check.Warning.NoTaggedWithClauses` — superseded by the built-in
+  `Credo.Check.Readability.WithCustomTaggedTuple`, which is broader (catches
+  any same-tag pattern, not only `:ok`/`:error` wrappers). Enable
+  `WithCustomTaggedTuple` in `.credo.exs` instead.
+
 ### Added
 
 - `LexCredo.Check.Warning.NonBooleanWithStrictOperator` — flags `and`/`or`/`not`

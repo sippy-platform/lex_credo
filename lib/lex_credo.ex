@@ -40,15 +40,9 @@ defmodule LexCredo do
     `assert Enum.all?/2` in tests; prefer a `for` loop with individual assertions
     that report the failing element.
 
-  - `LexCredo.Check.Warning.NoPipeIntoCase` (controversial) — flags `|> case do` patterns;
-    bind the value to a variable first.
-
   - `LexCredo.Check.Warning.NoProcessSleepInTests` *(test files only)* — flags
     `Process.sleep/1` and `Process.alive?/1` in tests; use `Process.monitor/1`
     and `assert_receive` instead.
-
-  - `LexCredo.Check.Warning.NoTaggedWithClauses` — flags tagged-tuple
-    workarounds in `with` clauses (e.g. `{:tag, {:ok, _}} <- {:tag, expr}`).
 
   - `LexCredo.Check.Warning.NonBooleanWithStrictOperator` — flags `and`/`or`/`not`
     when an operand is clearly non-boolean (struct field access without `?` suffix,

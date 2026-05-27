@@ -116,6 +116,10 @@
           {Credo.Check.Readability.UnnecessaryAliasExpansion, []},
           {Credo.Check.Readability.VariableNames, []},
           {Credo.Check.Readability.WithSingleClause, []},
+          # Covers |> case do and all other block pipes. Replaces LexCredo.Check.Warning.NoPipeIntoCase.
+          {Credo.Check.Readability.BlockPipe, []},
+          # Replaces LexCredo.Check.Warning.NoTaggedWithClauses; broader (catches any same-tag pattern, not just :ok/:error).
+          {Credo.Check.Readability.WithCustomTaggedTuple, []},
 
           #
           ## Refactoring Opportunities
@@ -173,9 +177,7 @@
           {LexCredo.Check.Warning.StructMatchInFunctionHead, []},
           {LexCredo.Check.Warning.NoComplexWithElse, []},
           {LexCredo.Check.Warning.NoEnumAllAssert, []},
-          {LexCredo.Check.Warning.NoPipeIntoCase, []},
           {LexCredo.Check.Warning.NoProcessSleepInTests, []},
-          {LexCredo.Check.Warning.NoTaggedWithClauses, []},
           {LexCredo.Check.Warning.NonBooleanWithStrictOperator, []},
           {LexCredo.Check.Warning.PreferBooleanOperators, []},
           {LexCredo.Check.Warning.UsePositiveTypeGuards, []},
@@ -195,7 +197,6 @@
           {Credo.Check.Design.DuplicatedCode, []},
           {Credo.Check.Design.SkipTestWithoutComment, []},
           {Credo.Check.Readability.AliasAs, []},
-          {Credo.Check.Readability.BlockPipe, []},
           {Credo.Check.Readability.ImplTrue, []},
           {Credo.Check.Readability.MultiAlias, []},
           {Credo.Check.Readability.NestedFunctionCalls, []},
@@ -206,7 +207,6 @@
           {Credo.Check.Readability.SinglePipe, []},
           {Credo.Check.Readability.Specs, []},
           {Credo.Check.Readability.StrictModuleLayout, []},
-          {Credo.Check.Readability.WithCustomTaggedTuple, []},
           {Credo.Check.Refactor.ABCSize, []},
           {Credo.Check.Refactor.AppendSingleItem, []},
           {Credo.Check.Refactor.CondInsteadOfIfElse, []},

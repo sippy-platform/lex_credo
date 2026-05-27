@@ -58,9 +58,7 @@ checks: %{
     {LexCredo.Check.Warning.StructMatchInFunctionHead, []},
     {LexCredo.Check.Warning.NoComplexWithElse, []},
     {LexCredo.Check.Warning.NoEnumAllAssert, []},
-    {LexCredo.Check.Warning.NoPipeIntoCase, []},
     {LexCredo.Check.Warning.NoProcessSleepInTests, []},
-    {LexCredo.Check.Warning.NoTaggedWithClauses, []},
     {LexCredo.Check.Warning.NonBooleanWithStrictOperator, []},
     {LexCredo.Check.Warning.PreferBooleanOperators, []},
     {LexCredo.Check.Warning.UsePositiveTypeGuards, []},
@@ -102,7 +100,7 @@ other checks.
 - **`false`** — disable the check entirely:
 
   ```elixir
-  {LexCredo.Check.Warning.NoPipeIntoCase, false}
+  {LexCredo.Check.Warning.NoComplexWithElse, false}
   ```
 
 - **`exit_status`** — make a check advisory-only (reports issues but does not
@@ -119,7 +117,7 @@ other checks.
 > Use a Credo inline comment to suppress a single occurrence without disabling
 > the check globally:
 >
->     result |> case do  # credo:disable-for-next-line LexCredo.Check.Warning.NoPipeIntoCase
+>     result = transform(value)  # credo:disable-for-next-line LexCredo.Check.Warning.StructMatchInFunctionHead
 
 ---
 
@@ -301,36 +299,6 @@ end
 
 ---
 
-#### `LexCredo.Check.Warning.NoPipeIntoCase`
-
-**Category:** Warning | **Priority:** High
-
-> #### Controversial {: .warning}
->
-> The `|> case do` pattern is used widely in the Elixir community and is syntactically valid. Many developers find it natural and prefer it for readability in pipelines. This check reflects the preference from [Keathley's style guide](https://keathley.io/blog/good-and-bad-elixir.html) to bind the intermediate value first so it can be inspected more easily. Disable if your team is comfortable with `|> case do`.
-
-Flags `|> case do` patterns. Binding the piped value to a named variable before branching makes the code easier to debug and the variable available for logging or pattern matching.
-
-```elixir
-# flagged
-result
-|> transform()
-|> case do
-  {:ok, val} -> val
-  {:error, _} -> nil
-end
-
-# preferred
-transformed = result |> transform()
-
-case transformed do
-  {:ok, val} -> val
-  {:error, _} -> nil
-end
-```
-
----
-
 #### `LexCredo.Check.Warning.NoProcessSleepInTests`
 
 **Category:** Warning | **Priority:** High | **Test files only**
@@ -346,37 +314,6 @@ assert Process.alive?(pid)
 ref = Process.monitor(pid)
 assert_receive {:DOWN, ^ref, :process, ^pid, _reason}
 ```
-
----
-
-#### `LexCredo.Check.Warning.NoTaggedWithClauses`
-
-**Category:** Warning | **Priority:** High
-
-Flags the tagged-tuple workaround used to identify which `with` clause failed in the `else` block:
-
-```elixir
-# flagged — tags exist only to tell apart which step failed
-with {:user, {:ok, user}} <- {:user, fetch_user(id)},
-     {:post, {:ok, post}} <- {:post, fetch_post(user)} do
-  {:ok, post}
-else
-  {:user, {:error, reason}} -> {:error, {:user, reason}}
-  {:post, {:error, reason}} -> {:error, {:post, reason}}
-end
-
-# preferred — each function returns a distinct error atom,
-# so the step that failed is clear without wrapping tuples
-with {:ok, user} <- fetch_user(id),
-     {:ok, post} <- fetch_post(user) do
-  {:ok, post}
-else
-  {:error, :user_not_found} = err -> err
-  {:error, :post_not_found} = err -> err
-end
-```
-
-This pattern exists to work around `with`'s inability to match partial results in `else`. Prefer having each function return a distinct, self-describing error tuple so no wrapping is needed.
 
 ---
 
@@ -488,7 +425,7 @@ To disable a check project-wide, move it to the `disabled:` list in `.credo.exs`
 ```elixir
 checks: %{
   disabled: [
-    {LexCredo.Check.Warning.NoPipeIntoCase, []},
+    {LexCredo.Check.Warning.NoComplexWithElse, []},
   ]
 }
 ```
