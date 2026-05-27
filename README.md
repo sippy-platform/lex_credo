@@ -28,7 +28,7 @@ Add `lex_credo` to your dependencies in `mix.exs`. It is typically only needed i
 ```elixir
 def deps do
   [
-    {:lex_credo, "~> 0.1.0", only: [:dev, :test], runtime: false}
+    {:lex_credo, "~> 0.2.0", only: [:dev, :test], runtime: false}
   ]
 end
 ```
