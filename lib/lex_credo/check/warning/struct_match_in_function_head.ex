@@ -86,7 +86,7 @@ defmodule LexCredo.Check.Warning.StructMatchInFunctionHead do
   defp plain_param_names({_fn_name, _meta, args}) when is_list(args),
     do: Enum.flat_map(args, &extract_variable/1)
 
-  defp plain_param_names(_), do: []
+  defp plain_param_names(_head), do: []
 
   # Plain variable: `def f(x)` → x
   defp extract_variable({name, _meta, nil})
@@ -99,7 +99,7 @@ defmodule LexCredo.Check.Warning.StructMatchInFunctionHead do
        do: [name]
 
   # Everything else (tuple patterns, map patterns, literals, …) — skip.
-  defp extract_variable(_), do: []
+  defp extract_variable(_arg), do: []
 
   # Multi-expression body — examine each statement in order.
   defp top_level_stmts({:__block__, _meta, stmts}), do: stmts
@@ -120,7 +120,7 @@ defmodule LexCredo.Check.Warning.StructMatchInFunctionHead do
         )
       ]
     else
-      _ -> []
+      _mismatch -> []
     end
   end
 
@@ -139,5 +139,5 @@ defmodule LexCredo.Check.Warning.StructMatchInFunctionHead do
     do: "_"
 
   # Plain map `%{}` or anything else — not a named struct.
-  defp struct_name(_), do: nil
+  defp struct_name(_ast), do: nil
 end

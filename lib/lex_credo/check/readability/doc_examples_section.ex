@@ -81,7 +81,7 @@ defmodule LexCredo.Check.Readability.DocExamplesSection do
 
   # @doc false / @doc nil — clear pending without flagging.
   defp traverse(
-         {:@, _meta, [{:doc, _doc_meta, [_]}]} = ast,
+         {:@, _meta, [{:doc, _doc_meta, [_doc_value]}]} = ast,
          {issues, _pending, issue_meta},
          _skip_def_types
        ) do
@@ -91,7 +91,7 @@ defmodule LexCredo.Check.Readability.DocExamplesSection do
   # Any recognised definition form — resolve the pending @doc.
   # If the def type is not in the skip list, flag missing examples.
   defp traverse(
-         {def_type, _meta, [head | _]} = ast,
+         {def_type, _meta, [head | _rest]} = ast,
          {issues, pending, issue_meta},
          skip_def_types
        )
@@ -112,9 +112,9 @@ defmodule LexCredo.Check.Readability.DocExamplesSection do
   defp traverse(ast, acc, _skip_def_types), do: {ast, acc}
 
   # Extract {name, arity} from a function head, handling `when` guards.
-  defp def_name_arity({:when, _meta, [head | _]}), do: def_name_arity(head)
+  defp def_name_arity({:when, _meta, [head | _guards]}), do: def_name_arity(head)
   defp def_name_arity({name, _meta, args}) when is_atom(name), do: {name, length(args || [])}
-  defp def_name_arity(_), do: nil
+  defp def_name_arity(_head), do: nil
 
   defp check_pending_doc(nil, _name, _arity, _issue_meta), do: []
 

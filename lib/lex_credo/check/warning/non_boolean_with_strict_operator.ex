@@ -116,5 +116,5 @@ defmodule LexCredo.Check.Warning.NonBooleanWithStrictOperator do
   # type cannot be determined statically, so we do not flag. In particular,
   # struct field accesses such as `user.active` are left alone — boolean fields
   # without a `?` suffix are common in Elixir (e.g. Ecto schemas).
-  defp clearly_non_boolean?(_), do: false
+  defp clearly_non_boolean?(_expr), do: false
 end
