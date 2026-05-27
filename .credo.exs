@@ -170,6 +170,7 @@
           {LexCredo.Check.Design.NoNestedModules, []},
           {LexCredo.Check.Readability.DocExamplesSection, []},
           {LexCredo.Check.Refactor.NoEnumWrapperFunctions, []},
+          {LexCredo.Check.Warning.StructMatchInFunctionHead, []},
           {LexCredo.Check.Warning.NoComplexWithElse, []},
           {LexCredo.Check.Warning.NoEnumAllAssert, []},
           {LexCredo.Check.Warning.NoPipeIntoCase, []},

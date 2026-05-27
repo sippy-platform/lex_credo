@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- `LexCredo.Check.Warning.StructMatchInFunctionHead` — flags `%Struct{} = param`
+  at the top level of a function body when `param` is a plain-variable argument.
+  Moving the struct match to the function head makes the type visible in the
+  signature and enables Elixir's type checker to infer the parameter type.
+  Only top-level body statements are checked; matches nested inside `case`,
+  `if`, `with`, etc. are left alone.
+- `LexCredo.Check.Warning.PreferIsNil` — flags `== nil`, `!= nil`, `=== nil`,
+  and `!== nil` comparisons (both operand orders); suggests `is_nil(x)` and
+  `not is_nil(x)` for consistency with the `is_*` guard family. Note: conflicts
+  with the built-in `Credo.Check.Refactor.NegatedIsNil`; disable one.
+
 ## [0.1.0] - 2026-05-22
 
 Initial release.

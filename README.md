@@ -55,6 +55,7 @@ checks: %{
     {LexCredo.Check.Design.NoNestedModules, []},
     {LexCredo.Check.Readability.DocExamplesSection, []},
     {LexCredo.Check.Refactor.NoEnumWrapperFunctions, []},
+    {LexCredo.Check.Warning.StructMatchInFunctionHead, []},
     {LexCredo.Check.Warning.NoComplexWithElse, []},
     {LexCredo.Check.Warning.NoEnumAllAssert, []},
     {LexCredo.Check.Warning.NoPipeIntoCase, []},
@@ -211,6 +212,41 @@ Enum.map(users, &name_of/1)
 ---
 
 ### Warning
+
+#### `LexCredo.Check.Warning.StructMatchInFunctionHead`
+
+**Category:** Warning | **Priority:** Normal
+
+Flags `%Struct{} = param` at the top level of a function body when `param` is a plain-variable argument. Moving the struct match to the function head makes the expected type visible in the signature, enables multi-clause dispatch, and allows Elixir's type checker to infer the parameter type directly from the function signature.
+
+```elixir
+# flagged
+def process(data) do
+  %User{name: name, email: email} = data
+  send_welcome(name, email)
+end
+
+# preferred — struct contract visible in the signature
+def process(%User{name: name, email: email}) do
+  send_welcome(name, email)
+end
+
+# preferred — keep the binding if you also need the whole struct
+def process(%User{name: name, email: email} = data) do
+  send_welcome(name, email)
+  audit_log(data)
+end
+
+# not flagged — match is inside a case branch, not a top-level statement
+def process(data) do
+  case condition() do
+    true  -> %User{name: name} = data; name
+    false -> nil
+  end
+end
+```
+
+---
 
 #### `LexCredo.Check.Warning.NoComplexWithElse`
 

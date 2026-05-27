@@ -28,6 +28,11 @@ defmodule LexCredo do
 
   ### Warning
 
+  - `LexCredo.Check.Warning.StructMatchInFunctionHead` — flags `%Struct{} = param`
+    at the top level of a function body when `param` is a plain-variable
+    argument; moving the struct match to the function head makes the type
+    visible in the signature and enables type inference.
+
   - `LexCredo.Check.Warning.NoComplexWithElse` — flags `with` expressions whose
     `else` block exceeds `max_else_clauses` (default: `1`).
 
