@@ -176,6 +176,7 @@
           {LexCredo.Check.Warning.NoPipeIntoCase, []},
           {LexCredo.Check.Warning.NoProcessSleepInTests, []},
           {LexCredo.Check.Warning.NoTaggedWithClauses, []},
+          {LexCredo.Check.Warning.NonBooleanWithStrictOperator, []},
           {LexCredo.Check.Warning.PreferBooleanOperators, []},
           {LexCredo.Check.Warning.UsePositiveTypeGuards, []},
           {LexCredo.Check.Warning.UseStartSupervised, []},

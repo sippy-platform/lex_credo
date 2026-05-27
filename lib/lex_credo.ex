@@ -50,6 +50,11 @@ defmodule LexCredo do
   - `LexCredo.Check.Warning.NoTaggedWithClauses` — flags tagged-tuple
     workarounds in `with` clauses (e.g. `{:tag, {:ok, _}} <- {:tag, expr}`).
 
+  - `LexCredo.Check.Warning.NonBooleanWithStrictOperator` — flags `and`/`or`/`not`
+    when an operand is clearly non-boolean (struct field access without `?` suffix,
+    non-boolean literal, etc.); suggests `&&`/`||`/`!` to avoid a runtime
+    `ArgumentError` and to signal truthy/falsy intent.
+
   - `LexCredo.Check.Warning.PreferBooleanOperators` (controversial) — flags `&&`, `||`, `!`
     when at least one operand is clearly boolean-returning; prefer `and`, `or`,
     `not`.

@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `LexCredo.Check.Warning.NonBooleanWithStrictOperator` — flags `and`/`or`/`not`
+  when any operand is clearly non-boolean (struct field access without `?` suffix,
+  non-boolean literal, `nil`, etc.); suggests `&&`/`||`/`!` to avoid a runtime
+  `ArgumentError` or misleading truthy/falsy semantics. Complements
+  `PreferBooleanOperators`.
 - `LexCredo.Check.Warning.StructMatchInFunctionHead` — flags `%Struct{} = param`
   at the top level of a function body when `param` is a plain-variable argument.
   Moving the struct match to the function head makes the type visible in the

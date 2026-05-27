@@ -61,6 +61,7 @@ checks: %{
     {LexCredo.Check.Warning.NoPipeIntoCase, []},
     {LexCredo.Check.Warning.NoProcessSleepInTests, []},
     {LexCredo.Check.Warning.NoTaggedWithClauses, []},
+    {LexCredo.Check.Warning.NonBooleanWithStrictOperator, []},
     {LexCredo.Check.Warning.PreferBooleanOperators, []},
     {LexCredo.Check.Warning.UsePositiveTypeGuards, []},
     {LexCredo.Check.Warning.UseStartSupervised, []},
@@ -379,6 +380,42 @@ This pattern exists to work around `with`'s inability to match partial results i
 
 ---
 
+#### `LexCredo.Check.Warning.NonBooleanWithStrictOperator`
+
+**Category:** Warning | **Priority:** Normal
+
+Flags `and`, `or`, and `not` when any operand is clearly not a boolean — such
+as a struct field access without a `?` suffix, a non-boolean literal, or `nil`.
+Using strict boolean operators with non-boolean operands either causes a runtime
+`ArgumentError` (if the left operand is not `true`/`false`) or signals
+misleading intent (if the expression can return a non-boolean value).
+
+```elixir
+# flagged — right side returns an ID, not a boolean; use &&
+Enum.find_value(accounts, &(&1.extension.exten == number and &1.id))
+
+# flagged — left side is a string field; and raises if it is nil
+user.name and is_valid?(user)
+
+# flagged — not requires a boolean argument; use !
+not user.name
+
+# preferred
+&1.extension.exten == number && &1.id
+user.name && is_valid?(user)
+!user.name
+
+# not flagged — ?-suffixed fields follow Elixir's boolean-returning convention
+user.active? and is_admin?(user)
+
+# not flagged — plain variables and unknown function calls; type cannot be
+# determined statically
+a and b
+MyModule.fetch() and condition
+```
+
+---
+
 #### `LexCredo.Check.Warning.PreferBooleanOperators`
 
 **Category:** Warning | **Priority:** Normal
@@ -387,23 +424,25 @@ This pattern exists to work around `with`'s inability to match partial results i
 >
 > The `&&`/`||`/`!` vs `and`/`or`/`not` distinction is one of the most debated style points in Elixir. Both sets of operators are valid in non-guard contexts. `&&`/`||` are more familiar to developers coming from other languages. This check reflects the opinion from the official anti-patterns guide that `and`/`or`/`not` should be preferred when operands are boolean-typed, since it signals intent more clearly. Disable if your team prefers `&&`/`||` uniformly.
 
-Flags `&&`, `||`, and `!` when at least one operand is a clearly boolean-yielding expression (an `is_*` guard, a comparison, a boolean literal, or another boolean operator). In these cases, `and`, `or`, and `not` are preferred.
+Flags `&&`, `||`, and `!` when **both** operands are clearly boolean-yielding expressions (an `is_*` guard, a comparison, a boolean literal, or another boolean operator). In these cases, `and`, `or`, and `not` are preferred.
 
 ```elixir
 # flagged — operands are boolean-typed
 is_binary(x) && is_integer(y)
-has_permission?(user) || is_admin?(user)
+is_nil(x) || is_atom(x)
 !is_nil(value)
 
 # preferred
 is_binary(x) and is_integer(y)
-has_permission?(user) or is_admin?(user)
+is_nil(x) or is_atom(x)
 not is_nil(value)
 
 # not flagged — truthy/falsy short-circuit idiom, not boolean-typed
 user && user.name
 config[:timeout] || 5_000
 ```
+
+> See also `NonBooleanWithStrictOperator` for the complementary check.
 
 ---
 
