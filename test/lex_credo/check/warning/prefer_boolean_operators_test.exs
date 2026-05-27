@@ -149,8 +149,10 @@ defmodule LexCredo.Check.Warning.PreferBooleanOperatorsTest do
     assert run(source) == []
   end
 
-  test "flags || when the left operand is a ! expression" do
-    # !x always returns a boolean, so (!x) || y should use `or`
+  test "does not flag || when only the left operand is boolean-like" do
+    # !x is always boolean, so or is technically safe — but the right operand y
+    # is unknown type, meaning the expression can return a non-boolean. Using
+    # `or` there would be misleading, so we don't flag it.
     source = """
     defmodule M do
       def f(x, y) do
@@ -159,8 +161,7 @@ defmodule LexCredo.Check.Warning.PreferBooleanOperatorsTest do
     end
     """
 
-    assert [issue] = run(source)
-    assert issue.trigger == "||"
+    assert run(source) == []
   end
 
   test "flags both the inner && and the outer || when all operands are boolean-like" do
@@ -194,9 +195,8 @@ defmodule LexCredo.Check.Warning.PreferBooleanOperatorsTest do
     assert "&&" in triggers
   end
 
-  test "flags && when right operand is the literal true" do
-    # Exercises boolean_like?(true): left operand (plain variable) is not
-    # boolean-like, so `or` does not short-circuit and the right side is reached.
+  test "does not flag && when only the right operand is boolean-like (literal true)" do
+    # x may be nil — `x and true` would raise, `x && true` returns nil.
     source = """
     defmodule M do
       def f(x) do
@@ -205,16 +205,40 @@ defmodule LexCredo.Check.Warning.PreferBooleanOperatorsTest do
     end
     """
 
-    assert [issue] = run(source)
-    assert issue.trigger == "&&"
+    assert run(source) == []
   end
 
-  test "flags && when right operand is the literal false" do
-    # Exercises boolean_like?(false): same reasoning as above.
+  test "does not flag && when only the right operand is boolean-like (literal false)" do
     source = """
     defmodule M do
       def f(x) do
         x && false
+      end
+    end
+    """
+
+    assert run(source) == []
+  end
+
+  test "does not flag && when only the right operand is boolean-like (is_* call)" do
+    # user may be nil — `user and is_nil(user.name)` would raise.
+    source = """
+    defmodule M do
+      def f(user) do
+        user && is_nil(user.name)
+      end
+    end
+    """
+
+    assert run(source) == []
+  end
+
+  test "flags && when right operand is the literal true and left is boolean-like" do
+    # Exercises boolean_like?(true) on the right; left is also boolean-like.
+    source = """
+    defmodule M do
+      def f(x) do
+        is_integer(x) && true
       end
     end
     """

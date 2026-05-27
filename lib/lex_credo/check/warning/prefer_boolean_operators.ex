@@ -9,21 +9,28 @@ defmodule LexCredo.Check.Warning.PreferBooleanOperators do
 
       The strict boolean operators make intent clear and catch accidental truthy
       values (e.g. `:undefined` from Erlang APIs). This check flags `&&`, `||`,
-      and `!` when at least one operand is clearly boolean-returning — i.e. an
-      `is_*` guard call, a comparison operator, or another boolean operator.
+      and `!` when **both** operands are clearly boolean-returning — i.e. an
+      `is_*` guard call, a comparison operator, a literal boolean, or another
+      strict boolean operator.
 
-          # BAD — operands are boolean-typed
+      Requiring both sides prevents false positives: `and`/`or` raise an
+      `ArgumentError` if the *left* operand is not a boolean at runtime, so
+      `user && is_nil(user.name)` must not be rewritten as
+      `user and is_nil(user.name)` — `user` can be `nil`.
+
+          # BAD — both operands are clearly boolean-returning
           is_binary(x) && is_integer(y)
-          has_permission?(user) || is_admin?(user)
+          is_nil(x) || is_atom(x)
           !is_nil(value)
 
           # GOOD
           is_binary(x) and is_integer(y)
-          has_permission?(user) or is_admin?(user)
+          is_nil(x) or is_atom(x)
           not is_nil(value)
 
-          # NOT flagged — truthy/falsy short-circuit idiom, not boolean-typed
+          # NOT flagged — left side is not boolean-typed; &&/|| is the right tool
           user && user.name
+          user && is_nil(user.name)
           config[:timeout] || 5_000
       """,
       params: [
@@ -59,7 +66,7 @@ defmodule LexCredo.Check.Warning.PreferBooleanOperators do
   end
 
   defp traverse({:&&, meta, [left, right]} = ast, {issues, issue_meta}) do
-    if boolean_like?(left) or boolean_like?(right) do
+    if boolean_like?(left) and boolean_like?(right) do
       issue =
         format_issue(issue_meta,
           message: "Use `and` instead of `&&` when operands are boolean expressions.",
@@ -74,7 +81,7 @@ defmodule LexCredo.Check.Warning.PreferBooleanOperators do
   end
 
   defp traverse({:||, meta, [left, right]} = ast, {issues, issue_meta}) do
-    if boolean_like?(left) or boolean_like?(right) do
+    if boolean_like?(left) and boolean_like?(right) do
       issue =
         format_issue(issue_meta,
           message: "Use `or` instead of `||` when operands are boolean expressions.",
@@ -114,14 +121,16 @@ defmodule LexCredo.Check.Warning.PreferBooleanOperators do
   # `not`/`!`/`and`/`or` are strict boolean operators — they always return a boolean.
   defp boolean_like?({op, _meta, _args}) when op in [:not, :!, :and, :or], do: true
 
-  # `&&`/`||` are truthy/falsy short-circuit operators; they are only boolean-like
-  # when at least one of their operands is boolean-like. This avoids flagging
-  # idiomatic truthy patterns like `(user && user.name) || "default"`.
+  # `&&`/`||` are only considered boolean-like when *both* operands are
+  # boolean-like, because the expression can return a non-boolean value
+  # (the right operand) when the left is truthy/falsy. Using `and`/`or`
+  # in place of a `&&`/`||` whose result may be non-boolean would be
+  # misleading even if it compiled.
   defp boolean_like?({:&&, _meta, [left, right]}),
-    do: boolean_like?(left) or boolean_like?(right)
+    do: boolean_like?(left) and boolean_like?(right)
 
   defp boolean_like?({:||, _meta, [left, right]}),
-    do: boolean_like?(left) or boolean_like?(right)
+    do: boolean_like?(left) and boolean_like?(right)
 
   # Literal booleans.
   defp boolean_like?(true), do: true
