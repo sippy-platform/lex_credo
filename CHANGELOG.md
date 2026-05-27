@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-05-27
+
+### Fixed
+
+- All checks: renamed bare `_` catch-all variables to descriptive `_name` form
+  to satisfy Credo's `UnusedVariableNames` consistency check
+  (`DocExamplesSection`, `StructMatchInFunctionHead`, `NonBooleanWithStrictOperator`).
+- `DocExamplesSection`: flipped negated `if` condition to positive form
+  (`NegatedConditionsWithElse`).
+- `StructMatchInFunctionHead`: replaced `Enum.map/2 |> Enum.join/2` with
+  `Enum.map_join/3`; suppressed a false-positive from `NoEnumWrapperFunctions`
+  on a multi-clause function where one clause delegates to `Enum.flat_map/2`.
+
 ## [0.2.0] - 2026-05-27
 
 ### Removed
