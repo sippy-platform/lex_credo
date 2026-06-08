@@ -59,7 +59,7 @@ jobs:
         run: mix coveralls.json
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
         with:
           files: cover/excoveralls.json
           token: ${{ secrets.CODECOV_TOKEN }}
