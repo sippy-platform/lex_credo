@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-09-15
+
+### Fixed
+
+- `LexCredo.Check.Warning.NamedOtpBuiltins` now supports the shared
+  `exclude_test_files` parameter and is documented in the README.
+
 ## [0.4.0] - 2026-09-15
 
 ### Added
