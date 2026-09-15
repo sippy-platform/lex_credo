@@ -179,6 +179,7 @@
           {LexCredo.Check.Warning.NoComments, []},
           {LexCredo.Check.Warning.NoEnumAllAssert, []},
           {LexCredo.Check.Warning.NoProcessSleepInTests, []},
+          {LexCredo.Check.Warning.NamedOtpBuiltins, []},
           {LexCredo.Check.Warning.NonBooleanWithStrictOperator, []},
           {LexCredo.Check.Warning.PreferBooleanOperators, []},
           {LexCredo.Check.Warning.UsePositiveTypeGuards, []},
