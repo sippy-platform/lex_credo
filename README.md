@@ -57,6 +57,7 @@ checks: %{
     {LexCredo.Check.Refactor.NoEnumWrapperFunctions, []},
     {LexCredo.Check.Warning.StructMatchInFunctionHead, []},
     {LexCredo.Check.Warning.NoComplexWithElse, []},
+    {LexCredo.Check.Warning.NoComments, []},
     {LexCredo.Check.Warning.NoEnumAllAssert, []},
     {LexCredo.Check.Warning.NoProcessSleepInTests, []},
     {LexCredo.Check.Warning.NonBooleanWithStrictOperator, []},
@@ -277,6 +278,53 @@ end
 
 ```elixir
 {LexCredo.Check.Warning.NoComplexWithElse, [max_else_clauses: 2]}
+```
+
+---
+
+#### `LexCredo.Check.Warning.NoComments`
+
+**Category:** Warning | **Priority:** High | **Configured paths**
+
+Flags every `#` comment and documentation attribute (`@moduledoc`, `@doc`,
+`@typedoc`, and `@shortdoc`) in conventional Ecto migration files:
+`priv/*/migrations/*.exs`. Migrations should be concise, executable records of
+schema and data transitions. Keep the rationale for a migration, a field type,
+or an exceptional operational requirement in the pull request, linked issue,
+ADR, or deployment documentation instead.
+
+**Configuration:**
+
+The `paths:` parameter accepts exact relative file paths, relative directory
+paths, and regular expressions. It defaults to conventional Ecto migration
+directories, but makes the check useful for any code area where comments are
+forbidden.
+
+```elixir
+# A single generated file
+{LexCredo.Check.Warning.NoComments,
+ [paths: ["lib/my_app/generated/schema.ex"]]}
+
+# All files beneath a directory
+{LexCredo.Check.Warning.NoComments,
+ [paths: ["lib/my_app/generated"]]}
+
+# Arbitrary matching files
+{LexCredo.Check.Warning.NoComments,
+ [paths: [~r{^priv/.+/migrations/.+\.exs$}]}
+```
+
+For the rare migration where an inline comment is essential, explicitly disable
+the check for that file:
+
+```elixir
+# credo:disable-for-this-file LexCredo.Check.Warning.NoComments
+defmodule MyApp.Repo.Migrations.ExceptionalMigration do
+  use Ecto.Migration
+
+  # Documents an exceptional operational constraint.
+  def change, do: :ok
+end
 ```
 
 ---

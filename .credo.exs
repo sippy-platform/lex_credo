@@ -176,12 +176,13 @@
           {LexCredo.Check.Refactor.NoEnumWrapperFunctions, []},
           {LexCredo.Check.Warning.StructMatchInFunctionHead, []},
           {LexCredo.Check.Warning.NoComplexWithElse, []},
+          {LexCredo.Check.Warning.NoComments, []},
           {LexCredo.Check.Warning.NoEnumAllAssert, []},
           {LexCredo.Check.Warning.NoProcessSleepInTests, []},
           {LexCredo.Check.Warning.NonBooleanWithStrictOperator, []},
           {LexCredo.Check.Warning.PreferBooleanOperators, []},
           {LexCredo.Check.Warning.UsePositiveTypeGuards, []},
-          {LexCredo.Check.Warning.UseStartSupervised, []},
+          {LexCredo.Check.Warning.UseStartSupervised, []}
         ],
         disabled: [
           #

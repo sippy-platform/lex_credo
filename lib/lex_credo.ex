@@ -36,6 +36,9 @@ defmodule LexCredo do
   - `LexCredo.Check.Warning.NoComplexWithElse` — flags `with` expressions whose
     `else` block exceeds `max_else_clauses` (default: `1`).
 
+  - `LexCredo.Check.Warning.NoComments` — flags `#` comments and documentation
+    attributes in configured files; it defaults to Ecto migration files.
+
   - `LexCredo.Check.Warning.NoEnumAllAssert` *(test files only)* — flags
     `assert Enum.all?/2` in tests; prefer a `for` loop with individual assertions
     that report the failing element.
