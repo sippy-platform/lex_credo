@@ -26,6 +26,22 @@ defmodule LexCredo.Check.Warning.NoProcessSleepInTestsTest do
     assert issue.trigger == "Process.sleep"
   end
 
+  test "flags :timer.sleep/1 in a test file" do
+    source = """
+    defmodule MyTest do
+      use ExUnit.Case
+
+      test "waits" do
+        :timer.sleep(100)
+      end
+    end
+    """
+
+    assert [issue] = run(source)
+    assert issue.message =~ ":timer.sleep"
+    assert issue.trigger == ":timer.sleep"
+  end
+
   test "flags Process.alive?/1 in a test file" do
     source = """
     defmodule MyTest do

@@ -5,7 +5,7 @@ defmodule LexCredo.Check.Warning.NoProcessSleepInTests do
     param_defaults: [exclude_test_files: false],
     explanations: [
       check: """
-      Avoid `Process.sleep/1` and `Process.alive?/1` in test files.
+      Avoid `Process.sleep/1`, `:timer.sleep/1`, and `Process.alive?/1` in test files.
 
       `Process.sleep/1` creates brittle, timing-dependent tests. Use
       `Process.monitor/1` with `assert_receive {:DOWN, ...}` to wait for a
@@ -17,6 +17,7 @@ defmodule LexCredo.Check.Warning.NoProcessSleepInTests do
 
           # BAD
           Process.sleep(100)
+          :timer.sleep(100)
           assert Process.alive?(pid)
 
           # GOOD — wait for process to finish
@@ -64,11 +65,30 @@ defmodule LexCredo.Check.Warning.NoProcessSleepInTests do
     {ast, {[issue | issues], issue_meta}}
   end
 
+  defp traverse(
+         {{:., meta, [:timer, :sleep]}, _call_meta, _args} = ast,
+         {issues, issue_meta}
+       ) do
+    issue =
+      format_issue(issue_meta,
+        message: message_for(:timer_sleep),
+        line_no: meta[:line],
+        trigger: ":timer.sleep"
+      )
+
+    {ast, {[issue | issues], issue_meta}}
+  end
+
   defp traverse(ast, acc), do: {ast, acc}
 
   defp message_for(:sleep),
     do:
       "Avoid `Process.sleep/1` in tests. " <>
+        "Use `Process.monitor/1` + `assert_receive {:DOWN, ...}` or `:sys.get_state/1` instead."
+
+  defp message_for(:timer_sleep),
+    do:
+      "Avoid `:timer.sleep/1` in tests. " <>
         "Use `Process.monitor/1` + `assert_receive {:DOWN, ...}` or `:sys.get_state/1` instead."
 
   defp message_for(:alive?),
