@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-09-15
+
+### Added
+
+- `LexCredo.Check.Warning.NoComments` — flags `#` comments and documentation
+  attributes (`@moduledoc`, `@doc`, `@typedoc`, and `@shortdoc`) in configured
+  files. Defaults to conventional Ecto migration directories; configure `paths:`
+  with exact file paths, directory paths, or regular expressions to use the rule
+  elsewhere. A per-file Credo suppression remains available for exceptional cases.
+
 ## [0.2.1] - 2026-05-27
 
 ### Fixed
