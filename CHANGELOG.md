@@ -7,11 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-09-15
+
 ### Added
 
 - `LexCredo.Check.Warning.NamedOtpBuiltins` — flags literal `DynamicSupervisor`
   and `Registry` child specs that omit `name:` so callers can address the
   process through the standard named APIs.
+- `LexCredo.Check.Warning.NoProcessSleepInTests` now flags `:timer.sleep/1`
+  alongside `Process.sleep/1` and `Process.alive?/1` in test files.
 
 ## [0.3.0] - 2026-09-15
 
