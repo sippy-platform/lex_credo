@@ -2,6 +2,7 @@ defmodule LexCredo.Check.Warning.NamedOtpBuiltins do
   use Credo.Check,
     category: :warning,
     base_priority: :normal,
+    param_defaults: [exclude_test_files: false],
     explanations: [
       check: """
       Give `DynamicSupervisor` and `Registry` child specs a `name:` option.
@@ -17,20 +18,28 @@ defmodule LexCredo.Check.Warning.NamedOtpBuiltins do
           # GOOD
           {DynamicSupervisor, strategy: :one_for_one, name: MyApp.DynamicSupervisor}
           {Registry, keys: :unique, name: MyApp.Registry}
-      """
+      """,
+      params: [
+        exclude_test_files: "When `true`, skips test files. Default: `false`."
+      ]
     ]
 
   alias Credo.IssueMeta
+  alias LexCredo.CheckHelpers
 
   @named_otp_builtins [DynamicSupervisor, Registry]
 
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
-    issue_meta = IssueMeta.for(source_file, params)
+    if CheckHelpers.skip_for_test_file?(source_file, params, __MODULE__) do
+      []
+    else
+      issue_meta = IssueMeta.for(source_file, params)
 
-    Credo.Code.prewalk(source_file, &traverse/2, {[], issue_meta})
-    |> elem(0)
+      Credo.Code.prewalk(source_file, &traverse/2, {[], issue_meta})
+      |> elem(0)
+    end
   end
 
   defp traverse({module_ast, options} = ast, {issues, issue_meta}) when is_list(options) do

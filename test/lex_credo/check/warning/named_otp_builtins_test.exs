@@ -62,4 +62,17 @@ defmodule LexCredo.Check.Warning.NamedOtpBuiltinsTest do
 
     assert run(source) == []
   end
+
+  test "does not flag a test file when exclude_test_files: true" do
+    source = """
+    children = [{DynamicSupervisor, strategy: :one_for_one}]
+    """
+
+    issues =
+      source
+      |> Credo.SourceFile.parse("test/my_test.exs")
+      |> NamedOtpBuiltins.run(exclude_test_files: true)
+
+    assert issues == []
+  end
 end

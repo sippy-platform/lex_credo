@@ -60,6 +60,7 @@ checks: %{
     {LexCredo.Check.Warning.NoComments, []},
     {LexCredo.Check.Warning.NoEnumAllAssert, []},
     {LexCredo.Check.Warning.NoProcessSleepInTests, []},
+    {LexCredo.Check.Warning.NamedOtpBuiltins, []},
     {LexCredo.Check.Warning.NonBooleanWithStrictOperator, []},
     {LexCredo.Check.Warning.PreferBooleanOperators, []},
     {LexCredo.Check.Warning.UsePositiveTypeGuards, []},
@@ -351,16 +352,43 @@ end
 
 **Category:** Warning | **Priority:** High | **Test files only**
 
-Flags `Process.sleep/1` and `Process.alive?/1` in test files. `sleep` makes test suites slow and flaky; `alive?` produces race conditions. Use `Process.monitor/1` + `assert_receive {:DOWN, ...}` or `:sys.get_state/1` for deterministic synchronisation.
+Flags `Process.sleep/1`, `:timer.sleep/1`, and `Process.alive?/1` in test files. `sleep` makes test suites slow and flaky; `alive?` produces race conditions. Use `Process.monitor/1` + `assert_receive {:DOWN, ...}` or `:sys.get_state/1` for deterministic synchronisation.
 
 ```elixir
 # flagged
 Process.sleep(100)
+:timer.sleep(100)
 assert Process.alive?(pid)
 
 # preferred
 ref = Process.monitor(pid)
 assert_receive {:DOWN, ^ref, :process, ^pid, _reason}
+```
+
+---
+
+#### `LexCredo.Check.Warning.NamedOtpBuiltins`
+
+**Category:** Warning | **Priority:** Normal | **Configurable**
+
+Flags literal `DynamicSupervisor` and `Registry` child specs without a `name:`
+option. Naming these processes lets callers use the standard APIs without
+passing PIDs around. Dynamically assembled options are not inspected.
+
+```elixir
+# flagged
+{DynamicSupervisor, strategy: :one_for_one}
+{Registry, keys: :unique}
+
+# preferred
+{DynamicSupervisor, strategy: :one_for_one, name: MyApp.DynamicSupervisor}
+{Registry, keys: :unique, name: MyApp.Registry}
+```
+
+To skip test files:
+
+```elixir
+{LexCredo.Check.Warning.NamedOtpBuiltins, [exclude_test_files: true]}
 ```
 
 ---
