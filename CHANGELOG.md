@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `LexCredo.Check.Warning.NamedOtpBuiltins` — flags literal `DynamicSupervisor`
+  and `Registry` child specs that omit `name:` so callers can address the
+  process through the standard named APIs.
+
 ## [0.3.0] - 2026-09-15
 
 ### Added
