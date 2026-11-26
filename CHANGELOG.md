@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `LexCredo.Check.Readability.NoCommentsInMultilineExpressions` — flags comments
   between the steps of a multi-line pipeline or the entries of a multi-line map,
   struct, or keyword list.
+- `LexCredo.Check.Readability.NoMultilineKeywordIf` — flags keyword-form
+  `if` / `unless` expressions that span more than one line.
 
 ### Fixed
 

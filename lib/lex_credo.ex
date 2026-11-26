@@ -28,6 +28,9 @@ defmodule LexCredo do
     between the steps of a multi-line pipeline or the entries of a multi-line
     map, struct, or keyword list.
 
+  - `LexCredo.Check.Readability.NoMultilineKeywordIf` — flags `if cond, do: ...`
+    keyword forms that span more than one line; use a `do ... end` block.
+
   ### Refactor
 
   - `LexCredo.Check.Refactor.NoEnumWrapperFunctions` (controversial) — flags named functions

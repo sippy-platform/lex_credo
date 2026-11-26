@@ -56,6 +56,7 @@ checks: %{
     {LexCredo.Check.Readability.DocExamplesSection, []},
     {LexCredo.Check.Readability.ModuleAttributesBeforeFunctions, []},
     {LexCredo.Check.Readability.NoCommentsInMultilineExpressions, []},
+    {LexCredo.Check.Readability.NoMultilineKeywordIf, []},
     {LexCredo.Check.Refactor.NoEnumWrapperFunctions, []},
     {LexCredo.Check.Warning.StructMatchInFunctionHead, []},
     {LexCredo.Check.Warning.NoComplexWithElse, []},
@@ -272,6 +273,37 @@ plain (non-keyword) lists.
 ```elixir
 # Only inspect pipelines
 {LexCredo.Check.Readability.NoCommentsInMultilineExpressions, [kinds: [:pipe]]}
+```
+
+---
+
+#### `LexCredo.Check.Readability.NoMultilineKeywordIf`
+
+**Category:** Readability | **Priority:** Normal
+
+Flags the keyword form of `if` / `unless` (`if cond, do: a, else: b`) when it
+spans more than one line. The keyword form is meant for one-liners; once it is
+split over several lines — by hand or by `mix format` — use a `do ... end` block.
+
+```elixir
+# flagged
+if valid?(changeset),
+  do: Repo.insert(changeset),
+  else: {:error, changeset}
+
+# preferred
+if valid?(changeset) do
+  Repo.insert(changeset)
+else
+  {:error, changeset}
+end
+```
+
+**Configuration:**
+
+```elixir
+# Apply the same rule to function definitions
+{LexCredo.Check.Readability.NoMultilineKeywordIf, [macros: [:if, :unless, :def, :defp]]}
 ```
 
 ---
