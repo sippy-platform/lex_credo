@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Documented that `LexCredo.Check.Warning.NoComments` needs `priv/` in Credo's
+  `files.included`; the default Credo configuration never analyses migrations.
+
 ## [0.4.1] - 2026-09-15
 
 ### Fixed

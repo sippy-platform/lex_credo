@@ -294,6 +294,22 @@ schema and data transitions. Keep the rationale for a migration, a field type,
 or an exceptional operational requirement in the pull request, linked issue,
 ADR, or deployment documentation instead.
 
+> #### Add `priv/` to Credo's included files {: .warning}
+>
+> Credo only analyses the directories listed in `files.included` in your
+> `.credo.exs`, and the generated default does **not** include `priv/`. Without
+> it, this check never sees your migrations and silently reports nothing:
+>
+> ```elixir
+> files: %{
+>   included: [
+>     "lib/", "src/", "test/", "web/", "priv/",
+>     "apps/*/lib/", "apps/*/src/", "apps/*/test/", "apps/*/web/", "apps/*/priv/"
+>   ],
+>   ...
+> }
+> ```
+
 **Configuration:**
 
 The `paths:` parameter accepts exact relative file paths, relative directory
