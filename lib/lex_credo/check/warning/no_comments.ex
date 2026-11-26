@@ -74,7 +74,12 @@ defmodule LexCredo.Check.Warning.NoComments do
   end
 
   defp hash_comment_issues(source_file, issue_meta) do
-    case Code.string_to_quoted_with_comments(SourceFile.source(source_file), columns: true) do
+    parsed =
+      source_file
+      |> SourceFile.source()
+      |> Code.string_to_quoted_with_comments(columns: true)
+
+    case parsed do
       {:ok, _ast, comments} ->
         Enum.map(comments, fn %{line: line, text: text} ->
           format_issue(issue_meta,

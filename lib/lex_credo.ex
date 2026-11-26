@@ -21,6 +21,9 @@ defmodule LexCredo do
   - `LexCredo.Check.Readability.DocExamplesSection` (controversial) — flags `@doc` strings
     on public functions that are missing a `## Examples` section.
 
+  - `LexCredo.Check.Readability.PreferPipeOverNestedCalls` — flags `f(g(x))`
+    nesting (local and remote calls); use a pipeline.
+
   ### Refactor
 
   - `LexCredo.Check.Refactor.NoEnumWrapperFunctions` (controversial) — flags named functions
