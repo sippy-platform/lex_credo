@@ -135,8 +135,7 @@ defmodule LexCredo.Check.Readability.PreferPipeOverNestedCalls do
 
   defp pipeable?({{:., _dot_meta, [_module, name]}, meta, [_first | _rest]} = ast, config)
        when is_atom(name) do
-    not Keyword.get(meta, :no_parens, false) and
-      not Keyword.get(meta, :from_interpolation, false) and
+    not Keyword.get(meta, :from_interpolation, false) and
       function_name(ast) not in config.excluded
   end
 
@@ -155,7 +154,10 @@ defmodule LexCredo.Check.Readability.PreferPipeOverNestedCalls do
   defp function_name({name, _meta, _args}), do: Atom.to_string(name)
 
   defp module_name({:__aliases__, _meta, parts}), do: Enum.map_join(parts, ".", &to_string/1)
-  defp module_name({:__MODULE__, _meta, _context}), do: "__MODULE__"
+
+  defp module_name({variable, _meta, context}) when is_atom(variable) and is_atom(context),
+    do: Atom.to_string(variable)
+
   defp module_name(module) when is_atom(module), do: inspect(module)
   defp module_name(_module), do: "?"
 

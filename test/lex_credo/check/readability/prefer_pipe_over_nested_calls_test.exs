@@ -131,4 +131,19 @@ defmodule LexCredo.Check.Readability.PreferPipeOverNestedCallsTest do
     assert [_issue] = run(source, [], "test/sample_test.exs")
     assert run(source, [exclude_test_files: true], "test/sample_test.exs") == []
   end
+
+  test "flags paren-less remote calls with a nested first argument" do
+    assert ["IO.puts"] == triggers("IO.puts String.trim(x)")
+  end
+
+  test "walks pipeline steps that are not calls" do
+    assert [] == triggers("x |> transform")
+  end
+
+  test "names the module in the trigger" do
+    assert ["__MODULE__.run"] == triggers("__MODULE__.run(build(x))")
+    assert ["mod.run"] == triggers("mod.run(build(x))")
+    assert [":erlang.term_to_binary"] == triggers(":erlang.term_to_binary(build(x))")
+    assert ["?.run"] == triggers("get_module().run(build(x))")
+  end
 end
