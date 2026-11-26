@@ -54,6 +54,8 @@ checks: %{
 
     {LexCredo.Check.Design.NoNestedModules, []},
     {LexCredo.Check.Readability.DocExamplesSection, []},
+    {LexCredo.Check.Readability.ModuleAttributesBeforeFunctions, []},
+    {LexCredo.Check.Readability.NoCommentsInMultilineExpressions, []},
     {LexCredo.Check.Readability.NoMultilineKeywordIf, []},
     {LexCredo.Check.Refactor.NoEnumWrapperFunctions, []},
     {LexCredo.Check.Warning.StructMatchInFunctionHead, []},
@@ -183,6 +185,95 @@ def parse_date(str), do: ...
 ```
 
 > Does not fire on `@doc false` or `@doc nil`.
+
+---
+
+#### `LexCredo.Check.Readability.ModuleAttributesBeforeFunctions`
+
+**Category:** Readability | **Priority:** Normal
+
+Flags types (`@type`, `@typep`, `@opaque`, `@typedoc`), callbacks, and constant
+module attributes that are declared after the first function definition. Keep a
+module's vocabulary at the top, before its behaviour.
+
+```elixir
+# flagged
+defmodule MyApp.Worker do
+  def run(job), do: process(job, @timeout)
+
+  @type job :: map()   # <-- flagged
+  @timeout 5_000       # <-- flagged
+
+  defp process(job, timeout), do: {job, timeout}
+end
+
+# preferred
+defmodule MyApp.Worker do
+  @type job :: map()
+
+  @timeout 5_000
+
+  def run(job), do: process(job, @timeout)
+
+  defp process(job, timeout), do: {job, timeout}
+end
+```
+
+Attributes that annotate the next function are allowed anywhere: `@doc`,
+`@spec`, `@impl`, `@deprecated`, `@dialyzer`, `@compile`, `@decorate`, and
+ExUnit's `@tag`, `@describetag`, and `@moduletag`.
+
+**Configuration:**
+
+```elixir
+# Allow DSL attributes such as Absinthe's @desc between functions
+{LexCredo.Check.Readability.ModuleAttributesBeforeFunctions, [allowed_attributes: [:desc]]}
+```
+
+> Compared to `Credo.Check.Readability.StrictModuleLayout`, this check reports
+> every misplaced attribute at once and does not enforce an order among the
+> attributes themselves.
+
+---
+
+#### `LexCredo.Check.Readability.NoCommentsInMultilineExpressions`
+
+**Category:** Readability | **Priority:** Normal
+
+Flags comments placed between the steps of a multi-line pipeline or between the
+entries of a multi-line map, struct, or keyword list. Such comments break the
+visual flow of the expression; extract a named function instead, or document
+the intent in `@doc` / `@moduledoc`.
+
+```elixir
+# flagged
+params
+# normalise the input first     <-- flagged
+|> normalize()
+|> save()
+
+%{
+  # the display name             <-- flagged
+  name: name,
+  age: age
+}
+
+# preferred
+params
+|> normalize()
+|> save()
+```
+
+Comments inside an anonymous function or `do ... end` block nested in the
+expression are not flagged, and neither are `credo:` directives or comments in
+plain (non-keyword) lists.
+
+**Configuration:**
+
+```elixir
+# Only inspect pipelines
+{LexCredo.Check.Readability.NoCommentsInMultilineExpressions, [kinds: [:pipe]]}
+```
 
 ---
 
@@ -325,6 +416,22 @@ Flags every `#` comment and documentation attribute (`@moduledoc`, `@doc`,
 schema and data transitions. Keep the rationale for a migration, a field type,
 or an exceptional operational requirement in the pull request, linked issue,
 ADR, or deployment documentation instead.
+
+> #### Add `priv/` to Credo's included files {: .warning}
+>
+> Credo only analyses the directories listed in `files.included` in your
+> `.credo.exs`, and the generated default does **not** include `priv/`. Without
+> it, this check never sees your migrations and silently reports nothing:
+>
+> ```elixir
+> files: %{
+>   included: [
+>     "lib/", "src/", "test/", "web/", "priv/",
+>     "apps/*/lib/", "apps/*/src/", "apps/*/test/", "apps/*/web/", "apps/*/priv/"
+>   ],
+>   ...
+> }
+> ```
 
 **Configuration:**
 
