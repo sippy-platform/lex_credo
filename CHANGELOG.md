@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   struct, or keyword list.
 - `LexCredo.Check.Readability.NoMultilineKeywordIf` — flags keyword-form
   `if` / `unless` expressions that span more than one line.
+- `LexCredo.Check.Readability.PreferPipeOverNestedCalls` — flags nested function
+  calls, including local calls missed by Credo's `NestedFunctionCalls`.
 
 ### Fixed
 

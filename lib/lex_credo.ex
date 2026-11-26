@@ -31,6 +31,9 @@ defmodule LexCredo do
   - `LexCredo.Check.Readability.NoMultilineKeywordIf` — flags `if cond, do: ...`
     keyword forms that span more than one line; use a `do ... end` block.
 
+  - `LexCredo.Check.Readability.PreferPipeOverNestedCalls` — flags `f(g(x))`
+    nesting (local and remote calls); use a pipeline.
+
   ### Refactor
 
   - `LexCredo.Check.Refactor.NoEnumWrapperFunctions` (controversial) — flags named functions

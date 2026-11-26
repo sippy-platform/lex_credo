@@ -57,6 +57,7 @@ checks: %{
     {LexCredo.Check.Readability.ModuleAttributesBeforeFunctions, []},
     {LexCredo.Check.Readability.NoCommentsInMultilineExpressions, []},
     {LexCredo.Check.Readability.NoMultilineKeywordIf, []},
+    {LexCredo.Check.Readability.PreferPipeOverNestedCalls, []},
     {LexCredo.Check.Refactor.NoEnumWrapperFunctions, []},
     {LexCredo.Check.Warning.StructMatchInFunctionHead, []},
     {LexCredo.Check.Warning.NoComplexWithElse, []},
@@ -305,6 +306,49 @@ end
 # Apply the same rule to function definitions
 {LexCredo.Check.Readability.NoMultilineKeywordIf, [macros: [:if, :unless, :def, :defp]]}
 ```
+
+---
+
+#### `LexCredo.Check.Readability.PreferPipeOverNestedCalls`
+
+**Category:** Readability | **Priority:** Normal
+
+Flags function calls whose first argument is another function call, and
+suggests a pipeline instead.
+
+```elixir
+# flagged
+save(normalize(params))
+String.upcase(String.trim(name))
+
+# preferred
+params |> normalize() |> save()
+name |> String.trim() |> String.upcase()
+```
+
+Credo's built-in `Credo.Check.Readability.NestedFunctionCalls` only fires when
+the outer call is a remote call (`Mod.fun(...)`), so `f(g(x))` and
+`f(String.trim(x))` slip through. This check covers local calls too. Enable one
+or the other, not both.
+
+Special forms and macros (`if`, `case`, `raise`, `assert`, ...), operators,
+access syntax (`map[:key]`), inner calls without arguments (`f(g())`),
+typespecs, and guards are never flagged.
+
+**Configuration:**
+
+```elixir
+{LexCredo.Check.Readability.PreferPipeOverNestedCalls,
+ [
+   # Only flag chains of three or more calls
+   min_pipeline_length: 3,
+   # Never treat these as pipeable
+   excluded_functions: ["is_nil", "Repo.all"]
+ ]}
+```
+
+> In test code, nested calls such as `json_response(get(conn, path), 200)` are
+> common. Use `exclude_test_files: true` if that is too noisy.
 
 ---
 
