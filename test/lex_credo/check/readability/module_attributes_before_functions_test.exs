@@ -171,4 +171,22 @@ defmodule LexCredo.Check.Readability.ModuleAttributesBeforeFunctionsTest do
     assert [_issue] = run(source, [], "test/sample_test.exs")
     assert run(source, [exclude_test_files: true], "test/sample_test.exs") == []
   end
+
+  test "handles a module body with a single statement" do
+    assert run("defmodule Sample do\n  def run, do: :ok\nend\n") == []
+    assert run("defmodule Sample do\n  @timeout 5_000\nend\n") == []
+  end
+
+  test "ignores statements that are not calls" do
+    source = """
+    defmodule Sample do
+      :ok
+      def run, do: @timeout
+      timeout
+      @timeout 5_000
+    end
+    """
+
+    assert [%{trigger: "@timeout"}] = run(source)
+  end
 end
