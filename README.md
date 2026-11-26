@@ -55,6 +55,7 @@ checks: %{
     {LexCredo.Check.Design.NoNestedModules, []},
     {LexCredo.Check.Readability.DocExamplesSection, []},
     {LexCredo.Check.Readability.ModuleAttributesBeforeFunctions, []},
+    {LexCredo.Check.Readability.NoCommentsInMultilineExpressions, []},
     {LexCredo.Check.Refactor.NoEnumWrapperFunctions, []},
     {LexCredo.Check.Warning.StructMatchInFunctionHead, []},
     {LexCredo.Check.Warning.NoComplexWithElse, []},
@@ -234,6 +235,47 @@ ExUnit's `@tag`, `@describetag`, and `@moduletag`.
 
 ---
 
+#### `LexCredo.Check.Readability.NoCommentsInMultilineExpressions`
+
+**Category:** Readability | **Priority:** Normal
+
+Flags comments placed between the steps of a multi-line pipeline or between the
+entries of a multi-line map, struct, or keyword list. Such comments break the
+visual flow of the expression; extract a named function instead, or document
+the intent in `@doc` / `@moduledoc`.
+
+```elixir
+# flagged
+params
+# normalise the input first     <-- flagged
+|> normalize()
+|> save()
+
+%{
+  # the display name             <-- flagged
+  name: name,
+  age: age
+}
+
+# preferred
+params
+|> normalize()
+|> save()
+```
+
+Comments inside an anonymous function or `do ... end` block nested in the
+expression are not flagged, and neither are `credo:` directives or comments in
+plain (non-keyword) lists.
+
+**Configuration:**
+
+```elixir
+# Only inspect pipelines
+{LexCredo.Check.Readability.NoCommentsInMultilineExpressions, [kinds: [:pipe]]}
+```
+
+---
+
 ### Refactor
 
 #### `LexCredo.Check.Refactor.NoEnumWrapperFunctions`
@@ -342,6 +384,22 @@ Flags every `#` comment and documentation attribute (`@moduledoc`, `@doc`,
 schema and data transitions. Keep the rationale for a migration, a field type,
 or an exceptional operational requirement in the pull request, linked issue,
 ADR, or deployment documentation instead.
+
+> #### Add `priv/` to Credo's included files {: .warning}
+>
+> Credo only analyses the directories listed in `files.included` in your
+> `.credo.exs`, and the generated default does **not** include `priv/`. Without
+> it, this check never sees your migrations and silently reports nothing:
+>
+> ```elixir
+> files: %{
+>   included: [
+>     "lib/", "src/", "test/", "web/", "priv/",
+>     "apps/*/lib/", "apps/*/src/", "apps/*/test/", "apps/*/web/", "apps/*/priv/"
+>   ],
+>   ...
+> }
+> ```
 
 **Configuration:**
 

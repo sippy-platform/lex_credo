@@ -24,6 +24,10 @@ defmodule LexCredo do
   - `LexCredo.Check.Readability.ModuleAttributesBeforeFunctions` — flags types,
     callbacks, and constant module attributes declared after the first function.
 
+  - `LexCredo.Check.Readability.NoCommentsInMultilineExpressions` — flags comments
+    between the steps of a multi-line pipeline or the entries of a multi-line
+    map, struct, or keyword list.
+
   ### Refactor
 
   - `LexCredo.Check.Refactor.NoEnumWrapperFunctions` (controversial) — flags named functions
@@ -40,7 +44,8 @@ defmodule LexCredo do
     `else` block exceeds `max_else_clauses` (default: `1`).
 
   - `LexCredo.Check.Warning.NoComments` — flags `#` comments and documentation
-    attributes in configured files; it defaults to Ecto migration files.
+    attributes in configured files; it defaults to Ecto migration files. Add
+    `priv/` to Credo's `files.included` so migrations are analysed.
 
   - `LexCredo.Check.Warning.NoEnumAllAssert` *(test files only)* — flags
     `assert Enum.all?/2` in tests; prefer a `for` loop with individual assertions
