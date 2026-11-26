@@ -54,6 +54,7 @@ checks: %{
 
     {LexCredo.Check.Design.NoNestedModules, []},
     {LexCredo.Check.Readability.DocExamplesSection, []},
+    {LexCredo.Check.Readability.NoCommentsInMultilineExpressions, []},
     {LexCredo.Check.Refactor.NoEnumWrapperFunctions, []},
     {LexCredo.Check.Warning.StructMatchInFunctionHead, []},
     {LexCredo.Check.Warning.NoComplexWithElse, []},
@@ -182,6 +183,47 @@ def parse_date(str), do: ...
 ```
 
 > Does not fire on `@doc false` or `@doc nil`.
+
+---
+
+#### `LexCredo.Check.Readability.NoCommentsInMultilineExpressions`
+
+**Category:** Readability | **Priority:** Normal
+
+Flags comments placed between the steps of a multi-line pipeline or between the
+entries of a multi-line map, struct, or keyword list. Such comments break the
+visual flow of the expression; extract a named function instead, or document
+the intent in `@doc` / `@moduledoc`.
+
+```elixir
+# flagged
+params
+# normalise the input first     <-- flagged
+|> normalize()
+|> save()
+
+%{
+  # the display name             <-- flagged
+  name: name,
+  age: age
+}
+
+# preferred
+params
+|> normalize()
+|> save()
+```
+
+Comments inside an anonymous function or `do ... end` block nested in the
+expression are not flagged, and neither are `credo:` directives or comments in
+plain (non-keyword) lists.
+
+**Configuration:**
+
+```elixir
+# Only inspect pipelines
+{LexCredo.Check.Readability.NoCommentsInMultilineExpressions, [kinds: [:pipe]]}
+```
 
 ---
 
