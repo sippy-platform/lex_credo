@@ -41,7 +41,8 @@ defmodule LexCredo do
     `else` block exceeds `max_else_clauses` (default: `1`).
 
   - `LexCredo.Check.Warning.NoComments` — flags `#` comments and documentation
-    attributes in configured files; it defaults to Ecto migration files.
+    attributes in configured files; it defaults to Ecto migration files. Add
+    `priv/` to Credo's `files.included` so migrations are analysed.
 
   - `LexCredo.Check.Warning.NoEnumAllAssert` *(test files only)* — flags
     `assert Enum.all?/2` in tests; prefer a `for` loop with individual assertions
