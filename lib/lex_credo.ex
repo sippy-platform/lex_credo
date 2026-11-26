@@ -21,6 +21,9 @@ defmodule LexCredo do
   - `LexCredo.Check.Readability.DocExamplesSection` (controversial) — flags `@doc` strings
     on public functions that are missing a `## Examples` section.
 
+  - `LexCredo.Check.Readability.ModuleAttributesBeforeFunctions` — flags types,
+    callbacks, and constant module attributes declared after the first function.
+
   ### Refactor
 
   - `LexCredo.Check.Refactor.NoEnumWrapperFunctions` (controversial) — flags named functions

@@ -54,6 +54,7 @@ checks: %{
 
     {LexCredo.Check.Design.NoNestedModules, []},
     {LexCredo.Check.Readability.DocExamplesSection, []},
+    {LexCredo.Check.Readability.ModuleAttributesBeforeFunctions, []},
     {LexCredo.Check.Refactor.NoEnumWrapperFunctions, []},
     {LexCredo.Check.Warning.StructMatchInFunctionHead, []},
     {LexCredo.Check.Warning.NoComplexWithElse, []},
@@ -182,6 +183,54 @@ def parse_date(str), do: ...
 ```
 
 > Does not fire on `@doc false` or `@doc nil`.
+
+---
+
+#### `LexCredo.Check.Readability.ModuleAttributesBeforeFunctions`
+
+**Category:** Readability | **Priority:** Normal
+
+Flags types (`@type`, `@typep`, `@opaque`, `@typedoc`), callbacks, and constant
+module attributes that are declared after the first function definition. Keep a
+module's vocabulary at the top, before its behaviour.
+
+```elixir
+# flagged
+defmodule MyApp.Worker do
+  def run(job), do: process(job, @timeout)
+
+  @type job :: map()   # <-- flagged
+  @timeout 5_000       # <-- flagged
+
+  defp process(job, timeout), do: {job, timeout}
+end
+
+# preferred
+defmodule MyApp.Worker do
+  @type job :: map()
+
+  @timeout 5_000
+
+  def run(job), do: process(job, @timeout)
+
+  defp process(job, timeout), do: {job, timeout}
+end
+```
+
+Attributes that annotate the next function are allowed anywhere: `@doc`,
+`@spec`, `@impl`, `@deprecated`, `@dialyzer`, `@compile`, `@decorate`, and
+ExUnit's `@tag`, `@describetag`, and `@moduletag`.
+
+**Configuration:**
+
+```elixir
+# Allow DSL attributes such as Absinthe's @desc between functions
+{LexCredo.Check.Readability.ModuleAttributesBeforeFunctions, [allowed_attributes: [:desc]]}
+```
+
+> Compared to `Credo.Check.Readability.StrictModuleLayout`, this check reports
+> every misplaced attribute at once and does not enforce an order among the
+> attributes themselves.
 
 ---
 
