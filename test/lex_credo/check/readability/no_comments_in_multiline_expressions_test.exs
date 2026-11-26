@@ -243,4 +243,42 @@ defmodule LexCredo.Check.Readability.NoCommentsInMultilineExpressionsTest do
     assert [_issue] = run(source, [], "test/sample_test.exs")
     assert run(source, [exclude_test_files: true], "test/sample_test.exs") == []
   end
+
+  test "does not flag comments outside any expression" do
+    source = """
+    # A file header comment
+    defmodule Sample do
+      def run, do: :ok
+    end
+    """
+
+    assert run(source) == []
+  end
+
+  test "does not flag trailing comments on single-line pipes, maps and keyword lists" do
+    source = """
+    defmodule Sample do
+      def run(params) do
+        params |> normalize() |> save() # pipe
+        map = %{a: 1} # map
+        opts = [a: 1] # keyword
+        {map, opts}
+      end
+    end
+    """
+
+    assert run(source) == []
+  end
+
+  test "returns no issues for source that does not parse" do
+    source = """
+    defmodule Sample do
+      def run(params) do
+        # unclosed
+        %{a: 1
+    end
+    """
+
+    assert run(source) == []
+  end
 end

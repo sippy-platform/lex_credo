@@ -148,12 +148,12 @@ defmodule LexCredo.Check.Readability.NoCommentsInMultilineExpressions do
   end
 
   defp collect({:fn, meta, _clauses} = ast, ranges) do
-    {ast, maybe_exempt_range(meta, meta[:closing], ranges)}
+    {ast, exempt_range(meta, meta[:closing], ranges)}
   end
 
   defp collect({_name, meta, _args} = ast, ranges) when is_list(meta) do
     if meta[:do] && meta[:end] do
-      {ast, maybe_exempt_range(meta[:do], meta[:end], ranges)}
+      {ast, exempt_range(meta[:do], meta[:end], ranges)}
     else
       {ast, ranges}
     end
@@ -175,12 +175,8 @@ defmodule LexCredo.Check.Readability.NoCommentsInMultilineExpressions do
     end
   end
 
-  defp maybe_exempt_range(start_meta, end_meta, ranges)
-       when is_list(start_meta) and is_list(end_meta) do
-    [range(:exempt, start_meta[:line], start_meta[:column], end_meta[:line], false) | ranges]
-  end
-
-  defp maybe_exempt_range(_start_meta, _end_meta, ranges), do: ranges
+  defp exempt_range(start_meta, end_meta, ranges),
+    do: [range(:exempt, start_meta[:line], start_meta[:column], end_meta[:line], false) | ranges]
 
   defp range(kind, start_line, start_column, end_line, inclusive_end) do
     %{
