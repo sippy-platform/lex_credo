@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `LexCredo.Check.Readability.NoMultilineKeywordIf` — flags keyword-form
+  `if` / `unless` expressions that span more than one line.
+
 ## [0.4.1] - 2026-09-15
 
 ### Fixed

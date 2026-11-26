@@ -54,6 +54,7 @@ checks: %{
 
     {LexCredo.Check.Design.NoNestedModules, []},
     {LexCredo.Check.Readability.DocExamplesSection, []},
+    {LexCredo.Check.Readability.NoMultilineKeywordIf, []},
     {LexCredo.Check.Refactor.NoEnumWrapperFunctions, []},
     {LexCredo.Check.Warning.StructMatchInFunctionHead, []},
     {LexCredo.Check.Warning.NoComplexWithElse, []},
@@ -182,6 +183,37 @@ def parse_date(str), do: ...
 ```
 
 > Does not fire on `@doc false` or `@doc nil`.
+
+---
+
+#### `LexCredo.Check.Readability.NoMultilineKeywordIf`
+
+**Category:** Readability | **Priority:** Normal
+
+Flags the keyword form of `if` / `unless` (`if cond, do: a, else: b`) when it
+spans more than one line. The keyword form is meant for one-liners; once it is
+split over several lines — by hand or by `mix format` — use a `do ... end` block.
+
+```elixir
+# flagged
+if valid?(changeset),
+  do: Repo.insert(changeset),
+  else: {:error, changeset}
+
+# preferred
+if valid?(changeset) do
+  Repo.insert(changeset)
+else
+  {:error, changeset}
+end
+```
+
+**Configuration:**
+
+```elixir
+# Apply the same rule to function definitions
+{LexCredo.Check.Readability.NoMultilineKeywordIf, [macros: [:if, :unless, :def, :defp]]}
+```
 
 ---
 
