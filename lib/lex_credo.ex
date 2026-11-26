@@ -21,6 +21,16 @@ defmodule LexCredo do
   - `LexCredo.Check.Readability.DocExamplesSection` (controversial) — flags `@doc` strings
     on public functions that are missing a `## Examples` section.
 
+  - `LexCredo.Check.Readability.ModuleAttributesBeforeFunctions` — flags types,
+    callbacks, and constant module attributes declared after the first function.
+
+  - `LexCredo.Check.Readability.NoCommentsInMultilineExpressions` — flags comments
+    between the steps of a multi-line pipeline or the entries of a multi-line
+    map, struct, or keyword list.
+
+  - `LexCredo.Check.Readability.NoMultilineKeywordIf` — flags `if cond, do: ...`
+    keyword forms that span more than one line; use a `do ... end` block.
+
   - `LexCredo.Check.Readability.PreferPipeOverNestedCalls` — flags `f(g(x))`
     nesting (local and remote calls); use a pipeline.
 
@@ -40,7 +50,8 @@ defmodule LexCredo do
     `else` block exceeds `max_else_clauses` (default: `1`).
 
   - `LexCredo.Check.Warning.NoComments` — flags `#` comments and documentation
-    attributes in configured files; it defaults to Ecto migration files.
+    attributes in configured files; it defaults to Ecto migration files. Add
+    `priv/` to Credo's `files.included` so migrations are analysed.
 
   - `LexCredo.Check.Warning.NoEnumAllAssert` *(test files only)* — flags
     `assert Enum.all?/2` in tests; prefer a `for` loop with individual assertions

@@ -29,6 +29,14 @@ defmodule LexCredo.Check.Warning.UsePositiveTypeGuards do
   alias Credo.IssueMeta
   alias LexCredo.CheckHelpers
 
+  # All built-in type-checking guard functions.
+  @type_guard_fns ~w[
+    is_nil is_binary is_atom is_integer is_float is_number
+    is_list is_map is_tuple is_function is_pid is_port
+    is_reference is_bitstring is_boolean is_struct is_exception
+    is_map_key
+  ]a
+
   @doc false
   @impl true
   def run(%SourceFile{} = source_file, params) do
@@ -41,14 +49,6 @@ defmodule LexCredo.Check.Warning.UsePositiveTypeGuards do
       |> elem(0)
     end
   end
-
-  # All built-in type-checking guard functions.
-  @type_guard_fns ~w[
-    is_nil is_binary is_atom is_integer is_float is_number
-    is_list is_map is_tuple is_function is_pid is_port
-    is_reference is_bitstring is_boolean is_struct is_exception
-    is_map_key
-  ]a
 
   # Match `def`/`defp` with a `when` guard in the function head.
   defp traverse(

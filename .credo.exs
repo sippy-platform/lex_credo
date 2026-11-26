@@ -173,6 +173,9 @@
           #
           {LexCredo.Check.Design.NoNestedModules, []},
           {LexCredo.Check.Readability.DocExamplesSection, []},
+          {LexCredo.Check.Readability.ModuleAttributesBeforeFunctions, []},
+          {LexCredo.Check.Readability.NoCommentsInMultilineExpressions, []},
+          {LexCredo.Check.Readability.NoMultilineKeywordIf, []},
           {LexCredo.Check.Readability.PreferPipeOverNestedCalls, []},
           {LexCredo.Check.Refactor.NoEnumWrapperFunctions, []},
           {LexCredo.Check.Warning.StructMatchInFunctionHead, []},

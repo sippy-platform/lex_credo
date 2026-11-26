@@ -9,8 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `LexCredo.Check.Readability.ModuleAttributesBeforeFunctions` — flags types,
+  callbacks, and constant module attributes declared after the first function.
+- `LexCredo.Check.Readability.NoCommentsInMultilineExpressions` — flags comments
+  between the steps of a multi-line pipeline or the entries of a multi-line map,
+  struct, or keyword list.
+- `LexCredo.Check.Readability.NoMultilineKeywordIf` — flags keyword-form
+  `if` / `unless` expressions that span more than one line.
 - `LexCredo.Check.Readability.PreferPipeOverNestedCalls` — flags nested function
   calls, including local calls missed by Credo's `NestedFunctionCalls`.
+
+### Fixed
+
+- Documented that `LexCredo.Check.Warning.NoComments` needs `priv/` in Credo's
+  `files.included`; the default Credo configuration never analyses migrations.
 
 ## [0.4.1] - 2026-09-15
 
