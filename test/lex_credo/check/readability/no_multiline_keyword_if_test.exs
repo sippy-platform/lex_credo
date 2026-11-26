@@ -118,4 +118,42 @@ defmodule LexCredo.Check.Readability.NoMultilineKeywordIfTest do
     assert [_issue] = run(source, [], "test/sample_test.exs")
     assert run(source, [exclude_test_files: true], "test/sample_test.exs") == []
   end
+
+  test "flags the keyword form when do: is not the first key" do
+    source = """
+    defmodule Sample do
+      def run(x) do
+        if valid?(x),
+          else: :error,
+          do: :ok
+      end
+    end
+    """
+
+    assert [%{line_no: 3}] = run(source)
+  end
+
+  test "does not flag configured macros without a keyword body" do
+    source = """
+    defmodule Sample do
+      def run(x \\\\ nil)
+
+      def run(x), do: x
+    end
+    """
+
+    assert run(source, macros: [:def]) == []
+  end
+
+  test "returns no issues for source that does not parse" do
+    source = """
+    defmodule Sample do
+      def run(x) do
+        if x,
+          do: %{a: 1
+    end
+    """
+
+    assert run(source) == []
+  end
 end
