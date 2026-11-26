@@ -21,6 +21,9 @@ defmodule LexCredo do
   - `LexCredo.Check.Readability.DocExamplesSection` (controversial) — flags `@doc` strings
     on public functions that are missing a `## Examples` section.
 
+  - `LexCredo.Check.Readability.ModuleAttributesBeforeFunctions` — flags types,
+    callbacks, and constant module attributes declared after the first function.
+
   - `LexCredo.Check.Readability.NoCommentsInMultilineExpressions` — flags comments
     between the steps of a multi-line pipeline or the entries of a multi-line
     map, struct, or keyword list.
